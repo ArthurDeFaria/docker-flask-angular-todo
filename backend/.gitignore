@@ -1,0 +1,15 @@
+# backend/.gitignore
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+venv/
+
+# Environment variables
+.env
+
+# IDE files
+.vscode/
+.idea/
