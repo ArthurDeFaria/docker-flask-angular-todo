@@ -1,0 +1,3 @@
+# Define que o Git deve tentar detectar arquivos de texto automaticamente
+# e força que os finais de linha sejam sempre LF (padrão Linux/macOS)
+* text=auto eol=lf
