@@ -50,8 +50,8 @@ Antes de começar, você vai precisar ter as seguintes ferramentas instaladas:
 Este é o método mais simples para subir a aplicação completa.
 
 Clone o repositório:
-```
-git clone 
+``` 
+git clone https://github.com/ArthurDeFaria/docker-flask-angular-todo.git
 ```
 
 Navegue até a pasta raiz do projeto:
@@ -69,7 +69,7 @@ Abra seu navegador e acesse ```http://localhost:4200.```
 ### Usando Docker Swarm (Modo de Cluster)
 Para demonstrar a capacidade de orquestração e escalonamento.
 
-Inicialize o Swarm (se ainda não tiver feito):
+Inicialize o Swarm:
 ```
 docker swarm init
 ```
@@ -77,7 +77,6 @@ docker swarm init
 Faça o deploy da stack:
 A partir da pasta raiz do projeto, execute:
 ```
-# O nome 'todoapp' é o nome da nossa stack (conjunto de serviços)
 docker stack deploy -c docker-compose.yml todoapp
 ```
 
