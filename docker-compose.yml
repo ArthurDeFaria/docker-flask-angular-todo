@@ -1,21 +1,18 @@
-# meu-todo-app/docker-compose.yml
-version: '3.8'
-
 services:
-  # Serviço do Backend (Flask)
+  # Serviço do Backend (Flask API)
   backend:
     build: ./backend
     ports:
       - "5000:5000"
+    env_file:
+      - ./backend/.env
     volumes:
-      # Monta o código local no container para desenvolvimento (hot-reload)
-      - ./backend:/app
+      - ./backend/app:/app/app
 
-  # Serviço do Frontend (Angular/Nginx)
+  # Serviço do Frontend (Angular UI)
   frontend:
     build: ./frontend
     ports:
       - "4200:80"
-    # Garante que o backend inicie antes do frontend
     depends_on:
       - backend
