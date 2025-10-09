@@ -4,6 +4,7 @@ import datetime
 
 @dataclass
 class Task:
+
     id: Optional[int]
     title: str
     description: Optional[str]
@@ -14,10 +15,3 @@ class Task:
 
     def to_dict(self):
         return asdict(self)
-
-# No futuro, devemos adicionar outras entidades aqui. Por exemplo:
-# @dataclass
-# class Tag:
-#     id: Optional[int]
-#     name: str
-#     color: str
