@@ -12,7 +12,6 @@ def create_task():
     data = request.get_json()
     if not data or not data.get('title'):
         return jsonify({"error": "O campo 'title' é obrigatório"}), 400
-    
     try:
         new_task = task_use_cases.create_task(
             title=data['title'],
@@ -34,7 +33,6 @@ def get_tasks():
 @tasks_bp.route('/api/tasks/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
     data = request.get_json()
-    
     updated_task = task_use_cases.update_task(
         task_id=task_id,
         title=data.get('title'),
@@ -42,7 +40,6 @@ def update_task(task_id):
         is_done=data.get('done'),
         parent_id=data.get('parent_id')
     )
-    
     if updated_task:
         return jsonify(updated_task.to_dict())
     return jsonify({"error": "Tarefa não encontrada"}), 404
