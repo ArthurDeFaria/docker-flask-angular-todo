@@ -1,7 +1,5 @@
-# backend/app/domain/models.py
-
-from dataclasses import dataclass, asdict
-from typing import Optional
+from dataclasses import dataclass, asdict, field
+from typing import Optional, List
 import datetime
 
 @dataclass
@@ -10,9 +8,9 @@ class Task:
     title: str
     description: Optional[str]
     completed_at: Optional[datetime.datetime]
-    
     due_date: Optional[datetime.date] = None
     parent_id: Optional[int] = None
+    children: List['Task'] = field(default_factory=list)
 
     def to_dict(self):
         return asdict(self)
