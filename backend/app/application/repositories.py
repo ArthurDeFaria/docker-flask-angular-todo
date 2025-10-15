@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from app.domain.models import Task
+from app.domain.models import Task, Tag
 
 class AbstractTaskRepository(ABC):
 
@@ -22,4 +22,21 @@ class AbstractTaskRepository(ABC):
 
     @abstractmethod
     def delete(self, task_id: int) -> None:
+        raise NotImplementedError
+    
+class AbstractTagRepository(ABC):
+    @abstractmethod
+    def add(self, tag: Tag) -> Tag:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_by_id(self, tag_id: int) -> Optional[Tag]:
+        raise NotImplementedError
+        
+    @abstractmethod
+    def get_by_name(self, tag_name: str) -> Optional[Tag]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_all(self) -> List[Tag]:
         raise NotImplementedError

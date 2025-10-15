@@ -1,11 +1,18 @@
 from flask import Blueprint, request, jsonify
-from app.application.use_cases import TaskUseCases
-from app.infrastructure.database.repositories import SQLAlchemyTaskRepository
+from app.application.use_cases import TaskUseCases, TagUseCases
+from app.infrastructure.database.repositories import SQLAlchemyTaskRepository, SQLAlchemyTagRepository
 
 tasks_bp = Blueprint('tasks_bp', __name__)
 
+# Repository
 task_repository = SQLAlchemyTaskRepository()
-task_use_cases = TaskUseCases(task_repository)
+tag_repository = SQLAlchemyTagRepository()
+
+# UseCases
+task_use_cases = TaskUseCases(task_repository, tag_repository)
+tag_use_cases = TagUseCases(tag_repository)
+
+
 
 @tasks_bp.route('/api/tasks', methods=['POST'])
 def create_task():
@@ -50,3 +57,34 @@ def delete_task(task_id):
     if success:
         return '', 204
     return jsonify({"error": "Tarefa não encontrada"}), 404
+
+@tasks_bp.route('/api/tags', methods=['POST'])
+def create_tag():
+    data = request.get_json()
+    if not data or not data.get('name'):
+        return jsonify({"error": "O campo 'name' é obrigatório"}), 400
+    try:
+        new_tag = tag_use_cases.create_tag(name=data['name'])
+        return jsonify(new_tag.to_dict()), 201
+    except Exception as e:
+        return jsonify({"error": "Ocorreu um erro ao criar a tag", "details": str(e)}), 500
+
+@tasks_bp.route('/api/tags', methods=['GET'])
+def get_tags():
+    try:
+        tags = tag_use_cases.get_all_tags()
+        return jsonify([tag.to_dict() for tag in tags])
+    except Exception as e:
+        return jsonify({"error": "Ocorreu um erro ao buscar as tags", "details": str(e)}), 500
+
+@tasks_bp.route('/api/tasks/<int:task_id>/tags', methods=['POST'])
+def add_tag_to_task(task_id):
+    data = request.get_json()
+    tag_id = data.get('tag_id')
+    if not tag_id:
+        return jsonify({"error": "O campo 'tag_id' é obrigatório"}), 400
+
+    updated_task = task_use_cases.add_tag_to_task(task_id, tag_id)
+    if updated_task:
+        return jsonify(updated_task.to_dict())
+    return jsonify({"error": "Tarefa ou Tag não encontrada"}), 404

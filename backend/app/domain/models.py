@@ -3,8 +3,15 @@ from typing import Optional, List
 import datetime
 
 @dataclass
-class Task:
+class Tag:
+    id: Optional[int]
+    name: str
 
+    def to_dict(self):
+        return asdict(self)
+
+@dataclass
+class Task:
     id: Optional[int]
     title: str
     description: Optional[str]
@@ -12,6 +19,9 @@ class Task:
     due_date: Optional[datetime.date] = None
     parent_id: Optional[int] = None
     children: List['Task'] = field(default_factory=list)
+    tags: List[Tag] = field(default_factory=list)
 
     def to_dict(self):
-        return asdict(self)
+        task_dict = asdict(self)
+        task_dict['tags'] = [tag.to_dict() for tag in self.tags]
+        return task_dict
