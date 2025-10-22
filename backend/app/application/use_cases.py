@@ -1,11 +1,12 @@
 from typing import List, Optional
 import datetime
-from app.domain.models import Task
-from .repositories import AbstractTaskRepository
+from app.domain.models import Task, Tag
+from .repositories import AbstractTaskRepository, AbstractTagRepository
 
 class TaskUseCases:
-    def __init__(self, task_repository: AbstractTaskRepository):
+    def __init__(self, task_repository: AbstractTaskRepository, tag_repository: AbstractTagRepository):
         self.task_repository = task_repository
+        self.tag_repository = tag_repository
 
     def create_task(self, title: str, description: Optional[str] = None, parent_id: Optional[int] = None) -> Task:
         task = Task(id=None, title=title, description=description, completed_at=None, parent_id=parent_id)
@@ -49,3 +50,29 @@ class TaskUseCases:
             return False
         self.task_repository.delete(task_id)
         return True
+    
+    def add_tag_to_task(self, task_id: int, tag_id: int) -> Optional[Task]:
+        task = self.task_repository.get_by_id(task_id)
+        tag = self.tag_repository.get_by_id(tag_id)
+        if task and tag:
+            # Evita adicionar tags duplicadas
+            if tag not in task.tags:
+                task.tags.append(tag)
+                return self.task_repository.update(task)
+        return None
+
+class TagUseCases:
+    def __init__(self, tag_repository: AbstractTagRepository):
+        self.tag_repository = tag_repository
+
+    def create_tag(self, name: str) -> Tag:
+        # Verifica se a tag já existe
+        existing_tag = self.tag_repository.get_by_name(name)
+        if existing_tag:
+            return existing_tag
+        
+        tag = Tag(id=None, name=name)
+        return self.tag_repository.add(tag)
+
+    def get_all_tags(self) -> List[Tag]:
+        return self.tag_repository.get_all()
