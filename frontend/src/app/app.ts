@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-// import { RouterOutlet } from '@angular/router';
+import {Home} from './pages/home/home';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule, 
-    // RouterOutlet, 
-    HttpClientModule
+    CommonModule,
+    HttpClientModule,
+    Home
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
