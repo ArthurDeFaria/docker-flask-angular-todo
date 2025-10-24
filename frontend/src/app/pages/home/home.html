@@ -1,1 +1,113 @@
-<p>Página Inicial</p>
+<div class="container">
+  <h1>To Do List</h1>
+
+  <!-- Caixa de Erro Global -->
+  <div *ngIf="errorMessage" class="error-box">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Layout Principal em Grid -->
+  <div class="dashboard-grid">
+
+    <!-- Coluna de Tarefas (Principal) -->
+    <div class="tasks-column">
+
+      <!-- Formulário de Nova Tarefa -->
+      <section class="card">
+        <h2>Criar Nova Tarefa</h2>
+        <form (ngSubmit)="handleCreateTask()" class="form-vertical">
+          <div class="form-group">
+            <label for="task-title">Título *</label>
+            <input id="task-title" type="text" [(ngModel)]="newTaskTitle" name="newTaskTitle" required>
+          </div>
+          <div class="form-group">
+            <label for="task-desc">Descrição</label>
+            <textarea id="task-desc" [(ngModel)]="newTaskDescription" name="newTaskDescription" rows="3"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+        </form>
+      </section>
+
+      <!-- Lista de Tarefas Pendentes -->
+      <section class="card">
+        <h2>Tarefas Pendentes</h2>
+        <div *ngIf="isLoadingTasks">Carregando tarefas...</div>
+        <div *ngIf="!isLoadingTasks && pendingTasks.length === 0">
+          Nenhuma tarefa pendente.
+        </div>
+
+        <div *ngFor="let task of pendingTasks" class="task-card">
+          <div class="task-content">
+            <h3>{{ task.title }}</h3>
+            <p *ngIf="task.description">{{ task.description }}</p>
+
+            <!-- Tags da Tarefa -->
+            <div class="tags-container">
+              <span *ngFor="let tag of task.tags" class="tag">{{ tag.name }}</span>
+            </div>
+          </div>
+
+          <!-- Ações da Tarefa -->
+          <div class="task-actions">
+            <select (change)="handleAssignTag(task, $event)" title="Adicionar tag">
+              <option value="">Adicionar Tag...</option>
+              <option *ngFor="let tag of availableTagsForTask(task)" [value]="tag.id">
+                {{ tag.name }}
+              </option>
+            </select>
+            <button (click)="handleToggleComplete(task)" class="btn btn-secondary">Concluir</button>
+            <button (click)="handleDeleteTask(task.id)" class="btn btn-danger">Excluir</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Lista de Tarefas Concluídas -->
+      <section class="card">
+        <h2>Tarefas Concluídas</h2>
+        <div *ngIf="isLoadingTasks">Carregando...</div>
+        <div *ngIf="!isLoadingTasks && completedTasks.length === 0">
+          Nenhuma tarefa concluída.
+        </div>
+
+        <div *ngFor="let task of completedTasks" class="task-card completed">
+          <div class="task-content">
+            <h3>{{ task.title }}</h3>
+            <div class="tags-container">
+              <span *ngFor="let tag of task.tags" class="tag">{{ tag.name }}</span>
+            </div>
+          </div>
+          <div class="task-actions">
+            <button (click)="handleToggleComplete(task)" class="btn btn-secondary">Reabrir</button>
+            <button (click)="handleDeleteTask(task.id)" class="btn btn-danger">Excluir</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Coluna de Tags (Lateral) -->
+    <div class="tags-column">
+      <section class="card">
+        <h2>Gerenciar Tags</h2>
+
+        <!-- Formulário de Nova Tag -->
+        <form (ngSubmit)="handleCreateTag()" class="form-vertical">
+          <div class="form-group">
+            <label for="tag-name">Nova Tag *</label>
+            <input id="tag-name" type="text" [(ngModel)]="newTagName" name="newTagName" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Criar Tag</button>
+        </form>
+
+        <!-- Lista de Tags Existentes -->
+        <h3 class="tags-list-title">Tags Existentes</h3>
+        <div *ngIf="isLoadingTags">Carregando tags...</div>
+        <div class="tags-container">
+          <span *ngIf="!isLoadingTags && tags.length === 0">Nenhuma tag criada.</span>
+          <span *ngFor="let tag of tags" class="tag">{{ tag.name }}</span>
+        </div>
+      </section>
+    </div>
+
+  </div> <!-- /dashboard-grid -->
+</div> <!-- /container -->
