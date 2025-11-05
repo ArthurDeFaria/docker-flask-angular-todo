@@ -40,3 +40,11 @@ class AbstractTagRepository(ABC):
     @abstractmethod
     def get_all(self) -> List[Tag]:
         raise NotImplementedError
+    
+    @abstractmethod
+    def update(self, tag: Tag) -> Tag:
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete(self, tag_id: int) -> None:
+        raise NotImplementedError
