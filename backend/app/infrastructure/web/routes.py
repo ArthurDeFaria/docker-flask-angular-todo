@@ -88,3 +88,29 @@ def add_tag_to_task(task_id):
     if updated_task:
         return jsonify(updated_task.to_dict())
     return jsonify({"error": "Tarefa ou Tag não encontrada"}), 404
+
+@tasks_bp.route('/api/tags/<int:tag_id>', methods=['PUT'])
+def update_tag(tag_id):
+    data = request.get_json()
+    name = data.get('name')
+    if not name:
+        return jsonify({"error": "O campo 'name' é obrigatório"}), 400
+
+    try:
+        updated_tag = tag_use_cases.update_tag(tag_id, name)
+        if updated_tag:
+            return jsonify(updated_tag.to_dict()), 200
+        return jsonify({"error": "Tag não encontrada"}), 404
+    except Exception as e:
+        return jsonify({"error": "Ocorreu um erro ao atualizar a tag", "details": str(e)}), 500
+
+@tasks_bp.route('/api/tags/<int:tag_id>', methods=['DELETE'])
+def delete_tag(tag_id):
+    try:
+        success = tag_use_cases.delete_tag(tag_id)
+        if success:
+            return '', 204
+        return jsonify({"error": "Tag não encontrada"}), 404
+    except Exception as e:
+        # Lidar com exceções (ex: se a tag estiver em uso e não puder ser deletada)
+        return jsonify({"error": "Ocorreu um erro ao deletar a tag", "details": str(e)}), 500

@@ -89,3 +89,17 @@ class SQLAlchemyTagRepository(AbstractTagRepository):
     def get_all(self) -> List[Tag]:
         all_tag_models = TagModel.query.all()
         return [self._to_domain(tm) for tm in all_tag_models]   
+    
+    def update(self, tag: Tag) -> Tag:
+        tag_model = TagModel.query.get(tag.id)
+        if tag_model:
+            tag_model.name = tag.name
+            db.session.commit()
+            return self._to_domain(tag_model)
+        return None
+
+    def delete(self, tag_id: int) -> None:
+        tag_model = TagModel.query.get(tag_id)
+        if tag_model:
+            db.session.delete(tag_model)
+            db.session.commit()

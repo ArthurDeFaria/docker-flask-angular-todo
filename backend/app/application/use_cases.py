@@ -76,3 +76,20 @@ class TagUseCases:
 
     def get_all_tags(self) -> List[Tag]:
         return self.tag_repository.get_all()
+    
+    def update_tag(self, tag_id: int, name: str) -> Optional[Tag]:
+        tag = self.tag_repository.get_by_id(tag_id)
+        if not tag:
+            return None
+        
+        existing_tag = self.tag_repository.get_by_name(name)
+        if existing_tag and existing_tag.id != tag_id:
+            return existing_tag
+
+        tag.name = name
+        return self.tag_repository.update(tag)
+
+    def delete_tag(self, tag_id: int) -> bool:
+        tag = self.tag_repository.get_by_id(tag_id)
+        if not tag:
+            return False

@@ -64,4 +64,14 @@ export class ApiService {
   addTagToTask(taskId: number, tagId: number): Observable<Task> {
     return this.http.post<Task>(`${this.apiUrl}/tasks/${taskId}/tags`, { tag_id: tagId });
   }
+
+  // PUT /api/tags/<tag_id>
+  updateTag(tagId: number, name: string): Observable<Tag> {
+    return this.http.put<Tag>(`${this.apiUrl}/tags/${tagId}`, { name: name });
+  }
+
+  // DELETE /api/tags/<tag_id>
+  deleteTag(tagId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/tags/${tagId}`);
+  }
 }
