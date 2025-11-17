@@ -42,9 +42,6 @@ export class Home implements OnInit {
     this.loadAllData();
   }
 
-  // =====================
-  //  TASK MODAL CONTROL
-  // =====================
   openCreateTaskModal(): void {
     this.isModalOpen = true;
     this.editingTask = null;
@@ -68,9 +65,6 @@ export class Home implements OnInit {
     this.editingTask = null;
   }
 
-  // =====================
-  //  TAG MODAL CONTROL
-  // =====================
   openCreateTagModal(): void {
     this.isTagModalOpen = true;
   }
@@ -80,9 +74,6 @@ export class Home implements OnInit {
     this.newTagName = '';
   }
 
-  // =====================
-  //  LOAD API DATA
-  // =====================
   loadAllData(): void {
     this.loadTasks();
     this.loadTags();
@@ -116,9 +107,6 @@ export class Home implements OnInit {
     });
   }
 
-  // =====================
-  //  CREATE / UPDATE TASK
-  // =====================
   saveTask(): void {
     if (!this.newTaskTitle.trim()) return;
 
@@ -155,9 +143,6 @@ export class Home implements OnInit {
     });
   }
 
-  // =====================
-  //  OTHER ACTIONS
-  // =====================
   handleToggleComplete(task: Task): void {
     const payload: UpdateTaskPayload = {
       done: !task.completed_at
@@ -199,9 +184,6 @@ export class Home implements OnInit {
     });
   }
 
-  // =====================
-  //  GETTERS
-  // =====================
   get pendingTasks(): Task[] {
     return this.tasks.filter(t => !t.completed_at);
   }
@@ -215,9 +197,6 @@ export class Home implements OnInit {
     return this.tags.filter(t => !taskTagIds.has(t.id));
   }
 
-  // =====================
-  //  MENU TOGGLE
-  // =====================
   toggleTaskMenu(task: Task) {
     task.showMenu = !task.showMenu;
     this.pendingTasks.forEach(t => {
