@@ -1,6 +1,4 @@
-<!-- ============================================= -->
-<!-- NOVO: Modal de Criar Tarefa                   -->
-<!-- ============================================= -->
+<!-- Modal Criar Tarefa -->
 <div *ngIf="isModalOpen" class="modal-overlay" (click)="closeCreateTaskModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -24,13 +22,8 @@
     </form>
   </div>
 </div>
-<!-- ============================================= -->
-<!-- Fim Modal Criar Tarefa                        -->
-<!-- ============================================= -->
 
-<!-- ============================================= -->
-<!-- NOVO: Modal de Criar Tag                      -->
-<!-- ============================================= -->
+<!-- Modal Criar Tag -->
 <div *ngIf="isTagModalOpen" class="modal-overlay" (click)="closeCreateTagModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -51,10 +44,6 @@
     </form>
   </div>
 </div>
-<!-- ============================================= -->
-<!-- Fim Modal Criar Tag                           -->
-<!-- ============================================= -->
-
 
 <div class="container">
   <h1>To Do List</h1>
@@ -88,14 +77,13 @@
             <p *ngIf="task.description">{{ task.description }}</p>
 
             <div class="tags-container">
-        <span *ngFor="let tag of task.tags" class="tag">
-          {{ tag.name }}
-          <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
-        </span>
+              <span *ngFor="let tag of task.tags" class="tag">
+                {{ tag.name }}
+                <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
+              </span>
             </div>
           </div>
 
-          <!-- 🔥 Novo botão 3 pontinhos -->
           <div class="task-menu-wrapper">
             <button class="menu-btn" (click)="toggleTaskMenu(task)">
               ⋮
@@ -133,14 +121,13 @@
             <h3>{{ task.title }}</h3>
 
             <div class="tags-container">
-        <span *ngFor="let tag of task.tags" class="tag">
-          {{ tag.name }}
-          <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
-        </span>
+              <span *ngFor="let tag of task.tags" class="tag">
+                {{ tag.name }}
+                <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
+              </span>
             </div>
           </div>
 
-          <!-- 🔥 Botão 3 pontinhos -->
           <div class="task-menu-wrapper">
             <button class="menu-btn" (click)="toggleCompletedMenu(task)">
               ⋮
