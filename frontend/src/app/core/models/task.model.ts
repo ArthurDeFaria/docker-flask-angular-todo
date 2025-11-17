@@ -2,6 +2,7 @@
 import { Tag } from './tag.model';
 
 export interface Task {
+  showMenu: boolean;
   id: number;
   title: string;
   description: string | null; // Pode ser string ou nulo

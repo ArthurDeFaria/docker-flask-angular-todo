@@ -1,3 +1,61 @@
+<!-- ============================================= -->
+<!-- NOVO: Modal de Criar Tarefa                   -->
+<!-- ============================================= -->
+<div *ngIf="isModalOpen" class="modal-overlay" (click)="closeCreateTaskModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Criar Nova Tarefa</h2>
+      <button (click)="closeCreateTaskModal()" class="modal-close-btn">&times;</button>
+    </div>
+
+    <form (ngSubmit)="handleCreateTask()" class="form-vertical">
+      <div class="form-group">
+        <label for="modal-task-title">Título *</label>
+        <input id="modal-task-title" type="text" [(ngModel)]="newTaskTitle" name="newTaskTitle" required>
+      </div>
+      <div class="form-group">
+        <label for="modal-task-desc">Descrição</label>
+        <textarea id="modal-task-desc" [(ngModel)]="newTaskDescription" name="newTaskDescription" rows="3"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" (click)="closeCreateTaskModal()" class="btn btn-secondary">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Tarefa</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- ============================================= -->
+<!-- Fim Modal Criar Tarefa                        -->
+<!-- ============================================= -->
+
+<!-- ============================================= -->
+<!-- NOVO: Modal de Criar Tag                      -->
+<!-- ============================================= -->
+<div *ngIf="isTagModalOpen" class="modal-overlay" (click)="closeCreateTagModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Criar Nova Tag</h2>
+      <button (click)="closeCreateTagModal()" class="modal-close-btn">&times;</button>
+    </div>
+
+    <form (ngSubmit)="handleCreateTag()" class="form-vertical">
+      <div class="form-group">
+        <label for="modal-tag-name">Nome da Tag *</label>
+        <input id="modal-tag-name" type="text" [(ngModel)]="newTagName" name="newTagName" required>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" (click)="closeCreateTagModal()" class="btn btn-secondary">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Tag</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- ============================================= -->
+<!-- Fim Modal Criar Tag                           -->
+<!-- ============================================= -->
+
+
 <div class="container">
   <h1>To Do List</h1>
 
@@ -10,18 +68,11 @@
     <div class="tasks-column">
 
       <section class="card">
-        <h2>Criar Nova Tarefa</h2>
-        <form (ngSubmit)="handleCreateTask()" class="form-vertical">
-          <div class="form-group">
-            <label for="task-title">Título *</label>
-            <input id="task-title" type="text" [(ngModel)]="newTaskTitle" name="newTaskTitle" required>
-          </div>
-          <div class="form-group">
-            <label for="task-desc">Descrição</label>
-            <textarea id="task-desc" [(ngModel)]="newTaskDescription" name="newTaskDescription" rows="3"></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
-        </form>
+        <h2>Nova Tarefa</h2>
+        <p>Clique no botão abaixo para adicionar uma nova tarefa.</p>
+        <button (click)="openCreateTaskModal()" class="btn btn-primary btn-full-width">
+          + Criar Nova Tarefa
+        </button>
       </section>
 
       <section class="card">
@@ -37,22 +88,35 @@
             <p *ngIf="task.description">{{ task.description }}</p>
 
             <div class="tags-container">
-              <span *ngFor="let tag of task.tags" class="tag">
-                {{ tag.name }}
-                <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
-              </span>
+        <span *ngFor="let tag of task.tags" class="tag">
+          {{ tag.name }}
+          <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
+        </span>
             </div>
           </div>
 
-          <div class="task-actions">
-            <select (change)="handleAssignTag(task, $event)" title="Adicionar tag">
-              <option value="">Adicionar Tag...</option>
-              <option *ngFor="let tag of availableTagsForTask(task)" [value]="tag.id">
-                {{ tag.name }}
-              </option>
-            </select>
-            <button (click)="handleToggleComplete(task)" class="btn btn-secondary">Concluir</button>
-            <button (click)="handleDeleteTask(task.id)" class="btn btn-danger">Excluir</button>
+          <!-- 🔥 Novo botão 3 pontinhos -->
+          <div class="task-menu-wrapper">
+            <button class="menu-btn" (click)="toggleTaskMenu(task)">
+              ⋮
+            </button>
+
+            <!-- Menu suspenso -->
+            <ul *ngIf="task.showMenu" class="task-menu">
+              <li (click)="openEditModal(task)">Editar</li>
+              <li (click)="handleToggleComplete(task)">Concluir</li>
+              <li (click)="handleDeleteTask(task.id)">Excluir</li>
+
+              <li class="add-tag-container">
+                <span>Adicionar Tag</span>
+                <select (change)="handleAssignTag(task, $event)" class="add-tag-select">
+                  <option value="">Selecione...</option>
+                  <option *ngFor="let availableTag of availableTagsForTask(task)" [value]="availableTag.id">
+                    {{ availableTag.name }}
+                  </option>
+                </select>
+              </li>
+            </ul>
           </div>
         </div>
       </section>
@@ -67,16 +131,26 @@
         <div *ngFor="let task of completedTasks" class="task-card completed">
           <div class="task-content">
             <h3>{{ task.title }}</h3>
+
             <div class="tags-container">
-              <span *ngFor="let tag of task.tags" class="tag">
-                {{ tag.name }}
-                <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
-              </span>
+        <span *ngFor="let tag of task.tags" class="tag">
+          {{ tag.name }}
+          <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
+        </span>
             </div>
           </div>
-          <div class="task-actions">
-            <button (click)="handleToggleComplete(task)" class="btn btn-secondary">Reabrir</button>
-            <button (click)="handleDeleteTask(task.id)" class="btn btn-danger">Excluir</button>
+
+          <!-- 🔥 Botão 3 pontinhos -->
+          <div class="task-menu-wrapper">
+            <button class="menu-btn" (click)="toggleCompletedMenu(task)">
+              ⋮
+            </button>
+
+            <!-- Menu suspenso -->
+            <ul *ngIf="task.showMenu" class="task-menu">
+              <li (click)="handleToggleComplete(task)">Reabrir</li>
+              <li (click)="handleDeleteTask(task.id)">Excluir</li>
+            </ul>
           </div>
         </div>
       </section>
@@ -87,13 +161,9 @@
       <section class="card">
         <h2>Gerenciar Tags</h2>
 
-        <form (ngSubmit)="handleCreateTag()" class="form-vertical">
-          <div class="form-group">
-            <label for="tag-name">Nova Tag *</label>
-            <input id="tag-name" type="text" [(ngModel)]="newTagName" name="newTagName" required>
-          </div>
-          <button type="submit" class="btn btn-primary">Criar Tag</button>
-        </form>
+        <button (click)="openCreateTagModal()" class="btn btn-primary btn-full-width">
+          + Criar Nova Tag
+        </button>
 
         <h3 class="tags-list-title">Tags Existentes</h3>
         <div *ngIf="isLoadingTags">Carregando tags...</div>
@@ -103,5 +173,6 @@
         </div>
       </section>
     </div>
+
   </div>
 </div>
