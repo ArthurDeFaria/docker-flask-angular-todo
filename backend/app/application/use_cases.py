@@ -55,18 +55,35 @@ class TaskUseCases:
         task = self.task_repository.get_by_id(task_id)
         tag = self.tag_repository.get_by_id(tag_id)
         if task and tag:
-            # Evita adicionar tags duplicadas
             if tag not in task.tags:
                 task.tags.append(tag)
                 return self.task_repository.update(task)
         return None
+
+    def remove_tag_from_task(self, task_id: int, tag_id: int) -> bool:
+        task = self.task_repository.get_by_id(task_id)
+        
+        if not task:
+            return False
+
+        tag_to_remove = None
+        for t in task.tags:
+            if t.id == tag_id:
+                tag_to_remove = t
+                break
+        
+        if tag_to_remove:
+            task.tags.remove(tag_to_remove)
+            self.task_repository.update(task)
+            return True
+        
+        return False
 
 class TagUseCases:
     def __init__(self, tag_repository: AbstractTagRepository):
         self.tag_repository = tag_repository
 
     def create_tag(self, name: str) -> Tag:
-        # Verifica se a tag já existe
         existing_tag = self.tag_repository.get_by_name(name)
         if existing_tag:
             return existing_tag

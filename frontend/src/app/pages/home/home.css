@@ -178,12 +178,32 @@ select {
 }
 
 .tag {
+  display: inline-flex;
+  align-items: center;
   background-color: #e0e0e0;
   color: #333;
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 500;
+}
+
+.btn-remove-tag {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  margin-left: 0.35rem;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #888;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.btn-remove-tag:hover {
+  color: #c82333;
 }
 
 .tags-list-title {

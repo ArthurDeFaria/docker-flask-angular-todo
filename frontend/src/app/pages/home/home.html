@@ -1,18 +1,14 @@
 <div class="container">
   <h1>To Do List</h1>
 
-  <!-- Caixa de Erro Global -->
   <div *ngIf="errorMessage" class="error-box">
     {{ errorMessage }}
   </div>
 
-  <!-- Layout Principal em Grid -->
   <div class="dashboard-grid">
 
-    <!-- Coluna de Tarefas (Principal) -->
     <div class="tasks-column">
 
-      <!-- Formulário de Nova Tarefa -->
       <section class="card">
         <h2>Criar Nova Tarefa</h2>
         <form (ngSubmit)="handleCreateTask()" class="form-vertical">
@@ -28,7 +24,6 @@
         </form>
       </section>
 
-      <!-- Lista de Tarefas Pendentes -->
       <section class="card">
         <h2>Tarefas Pendentes</h2>
         <div *ngIf="isLoadingTasks">Carregando tarefas...</div>
@@ -41,13 +36,14 @@
             <h3>{{ task.title }}</h3>
             <p *ngIf="task.description">{{ task.description }}</p>
 
-            <!-- Tags da Tarefa -->
             <div class="tags-container">
-              <span *ngFor="let tag of task.tags" class="tag">{{ tag.name }}</span>
+              <span *ngFor="let tag of task.tags" class="tag">
+                {{ tag.name }}
+                <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
+              </span>
             </div>
           </div>
 
-          <!-- Ações da Tarefa -->
           <div class="task-actions">
             <select (change)="handleAssignTag(task, $event)" title="Adicionar tag">
               <option value="">Adicionar Tag...</option>
@@ -61,7 +57,6 @@
         </div>
       </section>
 
-      <!-- Lista de Tarefas Concluídas -->
       <section class="card">
         <h2>Tarefas Concluídas</h2>
         <div *ngIf="isLoadingTasks">Carregando...</div>
@@ -73,7 +68,10 @@
           <div class="task-content">
             <h3>{{ task.title }}</h3>
             <div class="tags-container">
-              <span *ngFor="let tag of task.tags" class="tag">{{ tag.name }}</span>
+              <span *ngFor="let tag of task.tags" class="tag">
+                {{ tag.name }}
+                <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
+              </span>
             </div>
           </div>
           <div class="task-actions">
@@ -85,12 +83,10 @@
 
     </div>
 
-    <!-- Coluna de Tags (Lateral) -->
     <div class="tags-column">
       <section class="card">
         <h2>Gerenciar Tags</h2>
 
-        <!-- Formulário de Nova Tag -->
         <form (ngSubmit)="handleCreateTag()" class="form-vertical">
           <div class="form-group">
             <label for="tag-name">Nova Tag *</label>
@@ -99,7 +95,6 @@
           <button type="submit" class="btn btn-primary">Criar Tag</button>
         </form>
 
-        <!-- Lista de Tags Existentes -->
         <h3 class="tags-list-title">Tags Existentes</h3>
         <div *ngIf="isLoadingTags">Carregando tags...</div>
         <div class="tags-container">
@@ -108,6 +103,5 @@
         </div>
       </section>
     </div>
-
-  </div> <!-- /dashboard-grid -->
-</div> <!-- /container -->
+  </div>
+</div>
