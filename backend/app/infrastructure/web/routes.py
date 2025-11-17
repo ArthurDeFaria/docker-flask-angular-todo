@@ -4,14 +4,11 @@ from app.infrastructure.database.repositories import SQLAlchemyTaskRepository, S
 
 tasks_bp = Blueprint('tasks_bp', __name__)
 
-# Repository
 task_repository = SQLAlchemyTaskRepository()
 tag_repository = SQLAlchemyTagRepository()
 
-# UseCases
 task_use_cases = TaskUseCases(task_repository, tag_repository)
 tag_use_cases = TagUseCases(tag_repository)
-
 
 
 @tasks_bp.route('/api/tasks', methods=['POST'])
@@ -23,7 +20,7 @@ def create_task():
         new_task = task_use_cases.create_task(
             title=data['title'],
             description=data.get('description'),
-            parent_id=data.get('parent_id') # Passando o parent_id
+            parent_id=data.get('parent_id')
         )
         return jsonify(new_task.to_dict()), 201
     except Exception as e:
@@ -89,6 +86,13 @@ def add_tag_to_task(task_id):
         return jsonify(updated_task.to_dict())
     return jsonify({"error": "Tarefa ou Tag não encontrada"}), 404
 
+@tasks_bp.route('/api/tasks/<int:task_id>/tags/<int:tag_id>', methods=['DELETE'])
+def remove_tag_from_task(task_id, tag_id):
+    success = task_use_cases.remove_tag_from_task(task_id, tag_id)
+    if success:
+        return '', 204
+    return jsonify({"error": "Tarefa ou Tag não encontrada na tarefa"}), 404
+
 @tasks_bp.route('/api/tags/<int:tag_id>', methods=['PUT'])
 def update_tag(tag_id):
     data = request.get_json()
@@ -112,5 +116,4 @@ def delete_tag(tag_id):
             return '', 204
         return jsonify({"error": "Tag não encontrada"}), 404
     except Exception as e:
-        # Lidar com exceções (ex: se a tag estiver em uso e não puder ser deletada)
         return jsonify({"error": "Ocorreu um erro ao deletar a tag", "details": str(e)}), 500

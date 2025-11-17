@@ -16,26 +16,21 @@ import {CommonModule} from '@angular/common';
 })
 export class Home implements OnInit {
 
-  // --- Estado Principal ---
   public tasks: Task[] = [];
   public tags: Tag[] = [];
 
-  // --- Estados de Carregamento e Erro ---
   public isLoadingTasks = true;
   public isLoadingTags = true;
   public errorMessage: string | null = null;
 
-  // --- Formulário de Nova Tarefa ---
   public newTaskTitle = '';
   public newTaskDescription = '';
 
-  // --- Formulário de Nova Tag ---
   public newTagName = '';
 
   constructor(private api: ApiService) { }
 
   ngOnInit(): void {
-    // Carrega os dados iniciais quando o componente é iniciado
     this.loadAllData();
   }
 
@@ -43,8 +38,6 @@ export class Home implements OnInit {
     this.loadTasks();
     this.loadTags();
   }
-
-  // --- Métodos de Carregamento de Dados ---
 
   loadTasks(): void {
     this.isLoadingTasks = true;
@@ -78,11 +71,9 @@ export class Home implements OnInit {
     );
   }
 
-  // --- Métodos de Tarefas (Tasks) ---
-
   handleCreateTask(): void {
     if (!this.newTaskTitle.trim()) {
-      alert('O título é obrigatório.'); // Em um app real, usar um modal/toast
+      alert('O título é obrigatório.');
       return;
     }
 
@@ -93,7 +84,7 @@ export class Home implements OnInit {
 
     this.api.createTask(payload).subscribe(
       () => {
-        this.loadTasks(); // Recarrega a lista de tarefas
+        this.loadTasks();
         this.newTaskTitle = '';
         this.newTaskDescription = '';
       },
@@ -105,15 +96,13 @@ export class Home implements OnInit {
   }
 
   handleToggleComplete(task: Task): void {
-    // Se já tem data de conclusão, queremos reverter (is_done = false)
-    // Se não tem, queremos completar (is_done = true)
     const payload: UpdateTaskPayload = {
       done: !task.completed_at
     };
 
     this.api.updateTask(task.id, payload).subscribe(
       () => {
-        this.loadTasks(); // Recarrega a lista
+        this.loadTasks();
       },
       (error) => {
         console.error('Erro ao atualizar tarefa', error);
@@ -123,14 +112,9 @@ export class Home implements OnInit {
   }
 
   handleDeleteTask(taskId: number): void {
-    // Em um app real, pedir confirmação
-    // if (!confirm('Tem certeza que deseja excluir esta tarefa?')) {
-    //   return;
-    // }
-
     this.api.deleteTask(taskId).subscribe(
       () => {
-        this.loadTasks(); // Recarrega a lista
+        this.loadTasks();
       },
       (error) => {
         console.error('Erro ao excluir tarefa', error);
@@ -138,8 +122,6 @@ export class Home implements OnInit {
       }
     );
   }
-
-  // --- Métodos de Tags ---
 
   handleCreateTag(): void {
     if (!this.newTagName.trim()) {
@@ -149,12 +131,11 @@ export class Home implements OnInit {
 
     this.api.createTag(this.newTagName).subscribe(
       () => {
-        this.loadTags(); // Recarrega a lista de tags
+        this.loadTags();
         this.newTagName = '';
       },
       (error) => {
         console.error('Erro ao criar tag', error);
-        // O backend pode retornar um erro se a tag for duplicada
         this.errorMessage = 'Falha ao criar tag. (Talvez já exista?)';
       }
     );
@@ -168,8 +149,8 @@ export class Home implements OnInit {
 
     this.api.addTagToTask(task.id, +tagId).subscribe(
       () => {
-        this.loadTasks(); // Recarrega as tarefas para mostrar a nova tag
-        selectElement.value = ''; // Reseta o dropdown
+        this.loadTasks();
+        selectElement.value = '';
       },
       (error) => {
         console.error('Erro ao adicionar tag', error);
@@ -179,19 +160,26 @@ export class Home implements OnInit {
     );
   }
 
-  // --- Métodos Auxiliares (Helpers) ---
+  handleRemoveTag(task: Task, tag: Tag): void {
+    this.api.removeTagFromTask(task.id, tag.id).subscribe(
+      () => {
+        this.loadTasks();
+      },
+      (error) => {
+        console.error('Erro ao remover tag', error);
+        this.errorMessage = 'Falha ao remover tag da tarefa.';
+      }
+    );
+  }
 
-  // Filtra tarefas pendentes
   get pendingTasks(): Task[] {
     return this.tasks.filter(t => !t.completed_at);
   }
 
-  // Filtra tarefas concluídas
   get completedTasks(): Task[] {
     return this.tasks.filter(t => !!t.completed_at);
   }
 
-  // Filtra tags que ainda NÃO estão nesta tarefa específica
   availableTagsForTask(task: Task): Tag[] {
     const taskTagIds = new Set(task.tags?.map(t => t.id));
     return this.tags.filter(t => !taskTagIds.has(t.id));
