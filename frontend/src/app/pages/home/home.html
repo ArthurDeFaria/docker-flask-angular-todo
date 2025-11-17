@@ -39,6 +39,7 @@
           (delete)="handleDeleteTask($event)"
           (assignTag)="handleAssignTag($event.task, $event.event)"
           (removeTag)="handleRemoveTag($event.task, $event.tag)"
+          (createSubtask)="handleCreateSubtask($event)"
         ></app-task-item>
       </section>
 
@@ -57,6 +58,7 @@
           (delete)="handleDeleteTask($event)"
           (assignTag)="handleAssignTag($event.task, $event.event)"
           (removeTag)="handleRemoveTag($event.task, $event.tag)"
+          (createSubtask)="handleCreateSubtask($event)"
         ></app-task-item>
       </section>
 

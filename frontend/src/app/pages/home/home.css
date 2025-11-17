@@ -142,6 +142,16 @@ select:focus {
   color: var(--text-secondary);
 }
 
+/* --- Espaçamento entre Tarefas-Pai --- */
+app-task-item {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+app-task-item:last-of-type {
+  margin-bottom: 0;
+}
+
 /* --- Caixa de Erro --- */
 .error-box {
   background: var(--danger-light);

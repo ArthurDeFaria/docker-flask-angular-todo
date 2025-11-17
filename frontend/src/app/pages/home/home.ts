@@ -97,6 +97,24 @@ export class Home implements OnInit {
     );
   }
 
+  handleCreateSubtask(event: {parentId: number, title: string, description?: string}): void {
+    const payload: CreateTaskPayload = {
+      title: event.title,
+      description: event.description || undefined,
+      parent_id: event.parentId
+    };
+
+    this.api.createTask(payload).subscribe(
+      () => {
+        this.loadTasks();
+      },
+      (error) => {
+        console.error('Erro ao criar subtarefa', error);
+        this.errorMessage = 'Falha ao criar subtarefa.';
+      }
+    );
+  }
+
   handleToggleComplete(task: Task): void {
     const payload: UpdateTaskPayload = {
       done: !task.completed_at

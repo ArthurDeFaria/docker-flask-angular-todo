@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Task } from '../../core/models/task.model';
 import { Tag } from '../../core/models/tag.model';
 
@@ -8,6 +9,7 @@ import { Tag } from '../../core/models/tag.model';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     TaskItemComponent
   ],
   templateUrl: './task-item.component.html',
@@ -21,8 +23,19 @@ export class TaskItemComponent {
   @Output() delete = new EventEmitter<number>();
   @Output() assignTag = new EventEmitter<{task: Task, event: Event}>();
   @Output() removeTag = new EventEmitter<{task: Task, tag: Tag}>();
+  @Output() createSubtask = new EventEmitter<{parentId: number, title: string, description?: string}>();
+
+  public isCreatingSubtask = false;
+  public newSubtaskTitle = '';
+  public newSubtaskDescription = '';
+
+  public isChildrenVisible = false;
 
   constructor() {}
+
+  toggleChildrenVisibility(): void {
+    this.isChildrenVisible = !this.isChildrenVisible;
+  }
 
   availableTagsForTask(task: Task): Tag[] {
     const taskTagIds = new Set(task.tags?.map(t => t.id));
@@ -45,5 +58,27 @@ export class TaskItemComponent {
 
   onRemoveTag(task: Task, tag: Tag): void {
     this.removeTag.emit({task, tag});
+  }
+
+  onShowSubtaskForm(): void {
+    this.isCreatingSubtask = true;
+  }
+
+  onCancelSubtask(): void {
+    this.isCreatingSubtask = false;
+    this.newSubtaskTitle = '';
+    this.newSubtaskDescription = '';
+  }
+
+  onSubmitSubtask(): void {
+    if (!this.newSubtaskTitle.trim()) return;
+
+    this.createSubtask.emit({
+      parentId: this.task.id,
+      title: this.newSubtaskTitle,
+      description: this.newSubtaskDescription || undefined
+    });
+    
+    this.onCancelSubtask();
   }
 }

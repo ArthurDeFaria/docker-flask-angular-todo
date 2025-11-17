@@ -1,7 +1,18 @@
 <div class="task-card" [class.completed]="task.completed_at">
 
   <div class="task-content">
-    <h3>{{ task.title }}</h3>
+    <div class="task-title-header">
+      <button 
+        *ngIf="task.children && task.children.length > 0" 
+        (click)="toggleChildrenVisibility()" 
+        class="caret-btn"
+        [class.open]="isChildrenVisible"
+        title="{{ isChildrenVisible ? 'Ocultar' : 'Mostrar' }} subtarefas">
+        <span class="caret"></span>
+      </button>
+      <h3>{{ task.title }}</h3>
+    </div>
+    
     <p *ngIf="task.description">{{ task.description }}</p>
 
     <div class="tags-container">
@@ -19,21 +30,48 @@
         {{ tag.name }}
       </option>
     </select>
+    
+    <button (click)="onShowSubtaskForm()" class="btn btn-secondary" *ngIf="!task.completed_at && !isCreatingSubtask">
+      Adicionar Subtarefa
+    </button>
+    
     <button (click)="onToggle(task)" class="btn btn-secondary">
       {{ task.completed_at ? 'Reabrir' : 'Concluir' }}
     </button>
     <button (click)="onDelete(task.id)" class="btn btn-danger">Excluir</button>
   </div>
+
+  <div class="task-children" *ngIf="task.children && task.children.length > 0 && isChildrenVisible">
+    <app-task-item
+      *ngFor="let child of task.children"
+      [task]="child"
+      [allTags]="allTags"
+      (toggle)="onToggle($event)"
+      (delete)="onDelete($event)"
+      (assignTag)="onAssignTag($event.task, $event.event)"
+      (removeTag)="onRemoveTag($event.task, $event.tag)"
+      (createSubtask)="createSubtask.emit($event)"
+    ></app-task-item>
+  </div>
 </div>
 
-<div class="task-children" *ngIf="task.children && task.children.length > 0">
-  <app-task-item
-    *ngFor="let child of task.children"
-    [task]="child"
-    [allTags]="allTags"
-    (toggle)="onToggle($event)"
-    (delete)="onDelete($event)"
-    (assignTag)="onAssignTag($event.task, $event.event)"
-    (removeTag)="onRemoveTag($event.task, $event.tag)"
-  ></app-task-item>
+<div class="subtask-form" *ngIf="isCreatingSubtask">
+  <div class="subtask-form-inputs">
+    <input
+      type="text"
+      [(ngModel)]="newSubtaskTitle"
+      placeholder="Título da nova subtarefa..."
+      (keyup.escape)="onCancelSubtask()"
+    />
+    <textarea
+      [(ngModel)]="newSubtaskDescription"
+      placeholder="Descrição (opcional)..."
+      rows="2"
+      (keyup.escape)="onCancelSubtask()"
+    ></textarea>
+  </div>
+  <div class="subtask-form-actions">
+    <button (click)="onSubmitSubtask()" class="btn btn-primary">Salvar</button>
+    <button (click)="onCancelSubtask()" class="btn btn-secondary">Cancelar</button>
+  </div>
 </div>
