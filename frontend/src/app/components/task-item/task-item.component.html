@@ -1,0 +1,39 @@
+<div class="task-card" [class.completed]="task.completed_at">
+
+  <div class="task-content">
+    <h3>{{ task.title }}</h3>
+    <p *ngIf="task.description">{{ task.description }}</p>
+
+    <div class="tags-container">
+      <span *ngFor="let tag of task.tags" class="tag">
+        {{ tag.name }}
+        <button (click)="onRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
+      </span>
+    </div>
+  </div>
+
+  <div class="task-actions">
+    <select (change)="onAssignTag(task, $event)" title="Adicionar tag" *ngIf="!task.completed_at">
+      <option value="">Adicionar Tag...</option>
+      <option *ngFor="let tag of availableTagsForTask(task)" [value]="tag.id">
+        {{ tag.name }}
+      </option>
+    </select>
+    <button (click)="onToggle(task)" class="btn btn-secondary">
+      {{ task.completed_at ? 'Reabrir' : 'Concluir' }}
+    </button>
+    <button (click)="onDelete(task.id)" class="btn btn-danger">Excluir</button>
+  </div>
+</div>
+
+<div class="task-children" *ngIf="task.children && task.children.length > 0">
+  <app-task-item
+    *ngFor="let child of task.children"
+    [task]="child"
+    [allTags]="allTags"
+    (toggle)="onToggle($event)"
+    (delete)="onDelete($event)"
+    (assignTag)="onAssignTag($event.task, $event.event)"
+    (removeTag)="onRemoveTag($event.task, $event.tag)"
+  ></app-task-item>
+</div>

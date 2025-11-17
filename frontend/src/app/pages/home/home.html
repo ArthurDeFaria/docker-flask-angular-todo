@@ -31,30 +31,15 @@
           Nenhuma tarefa pendente.
         </div>
 
-        <div *ngFor="let task of pendingTasks" class="task-card">
-          <div class="task-content">
-            <h3>{{ task.title }}</h3>
-            <p *ngIf="task.description">{{ task.description }}</p>
-
-            <div class="tags-container">
-              <span *ngFor="let tag of task.tags" class="tag">
-                {{ tag.name }}
-                <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
-              </span>
-            </div>
-          </div>
-
-          <div class="task-actions">
-            <select (change)="handleAssignTag(task, $event)" title="Adicionar tag">
-              <option value="">Adicionar Tag...</option>
-              <option *ngFor="let tag of availableTagsForTask(task)" [value]="tag.id">
-                {{ tag.name }}
-              </option>
-            </select>
-            <button (click)="handleToggleComplete(task)" class="btn btn-secondary">Concluir</button>
-            <button (click)="handleDeleteTask(task.id)" class="btn btn-danger">Excluir</button>
-          </div>
-        </div>
+        <app-task-item
+          *ngFor="let task of pendingTasks"
+          [task]="task"
+          [allTags]="tags"
+          (toggle)="handleToggleComplete($event)"
+          (delete)="handleDeleteTask($event)"
+          (assignTag)="handleAssignTag($event.task, $event.event)"
+          (removeTag)="handleRemoveTag($event.task, $event.tag)"
+        ></app-task-item>
       </section>
 
       <section class="card">
@@ -64,21 +49,15 @@
           Nenhuma tarefa concluída.
         </div>
 
-        <div *ngFor="let task of completedTasks" class="task-card completed">
-          <div class="task-content">
-            <h3>{{ task.title }}</h3>
-            <div class="tags-container">
-              <span *ngFor="let tag of task.tags" class="tag">
-                {{ tag.name }}
-                <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
-              </span>
-            </div>
-          </div>
-          <div class="task-actions">
-            <button (click)="handleToggleComplete(task)" class="btn btn-secondary">Reabrir</button>
-            <button (click)="handleDeleteTask(task.id)" class="btn btn-danger">Excluir</button>
-          </div>
-        </div>
+        <app-task-item
+          *ngFor="let task of completedTasks"
+          [task]="task"
+          [allTags]="tags"
+          (toggle)="handleToggleComplete($event)"
+          (delete)="handleDeleteTask($event)"
+          (assignTag)="handleAssignTag($event.task, $event.event)"
+          (removeTag)="handleRemoveTag($event.task, $event.tag)"
+        ></app-task-item>
       </section>
 
     </div>
@@ -103,5 +82,6 @@
         </div>
       </section>
     </div>
+
   </div>
 </div>

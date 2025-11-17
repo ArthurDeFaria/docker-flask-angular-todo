@@ -4,6 +4,7 @@ import { Task } from '../../core/models/task.model';
 import { Tag } from '../../core/models/tag.model';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
+import { TaskItemComponent } from '../../components/task-item/task-item.component';
 
 @Component({
   selector: 'app-home',
@@ -11,6 +12,7 @@ import {CommonModule} from '@angular/common';
   imports: [
     FormsModule,
     CommonModule,
+    TaskItemComponent
   ],
   styleUrls: ['./home.css']
 })
@@ -150,12 +152,10 @@ export class Home implements OnInit {
     this.api.addTagToTask(task.id, +tagId).subscribe(
       () => {
         this.loadTasks();
-        selectElement.value = '';
       },
       (error) => {
         console.error('Erro ao adicionar tag', error);
         this.errorMessage = 'Falha ao adicionar tag à tarefa.';
-        selectElement.value = '';
       }
     );
   }
@@ -173,15 +173,10 @@ export class Home implements OnInit {
   }
 
   get pendingTasks(): Task[] {
-    return this.tasks.filter(t => !t.completed_at);
+    return this.tasks.filter(t => !t.completed_at && !t.parent_id);
   }
 
   get completedTasks(): Task[] {
-    return this.tasks.filter(t => !!t.completed_at);
-  }
-
-  availableTagsForTask(task: Task): Tag[] {
-    const taskTagIds = new Set(task.tags?.map(t => t.id));
-    return this.tags.filter(t => !taskTagIds.has(t.id));
+    return this.tasks.filter(t => !!t.completed_at && !t.parent_id);
   }
 }
