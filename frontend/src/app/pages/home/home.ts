@@ -182,6 +182,15 @@ export class Home implements OnInit {
     return !task.children || task.children.length === 0 || task.children.every(st => !!st.completed_at);
   }
 
+  getTaskProgress(task: Task): number {
+    if (!task.children || task.children.length === 0) {
+      return 0; // Se não houver subtarefas, o progresso é 0
+    }
+
+    const completedSubtasks = task.children.filter(sub => !!sub.completed_at).length;
+    return Math.round((completedSubtasks / task.children.length) * 100);
+  }
+
   handleToggleComplete(task: Task): void {
     const isCompleting = !task.completed_at;
 

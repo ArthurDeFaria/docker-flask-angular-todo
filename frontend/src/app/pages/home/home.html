@@ -59,7 +59,7 @@
       </div>
 
       <div class="modal-actions">
-        <button type="button" (click)="closeCreateTagModal()" class="btn btn-secondary">Cancelar</button>
+        <button type="button" (click)="closeCreateTaskModal()" class="btn btn-secondary">Cancelar</button>
         <button type="submit" class="btn btn-primary">Salvar Tag</button>
       </div>
     </form>
@@ -91,10 +91,22 @@
         <div *ngIf="isLoadingTasks">Carregando tarefas...</div>
         <div *ngIf="!isLoadingTasks && pendingTasks.length === 0">Nenhuma tarefa pendente.</div>
 
-        <div *ngFor="let task of pendingTasks" class="task-card">
+        <div *ngFor="let task of pendingTasks" class="task-card" [class.completed]="!!task.completed_at">
+          <!-- Checkbox customizada para a task principal -->
+          <label class="custom-checkbox">
+            <input type="checkbox" [checked]="!!task.completed_at" (change)="handleToggleComplete(task)">
+            <span class="checkmark"></span>
+          </label>
+
           <div class="task-content">
             <h3>{{ task.title }}</h3>
             <p *ngIf="task.description">{{ task.description }}</p>
+
+            <!-- Barra de Progresso -->
+            <div *ngIf="task.children && task.children.length > 0" class="progress-bar-container">
+              <div class="progress-bar" [style.width.%]="getTaskProgress(task)"></div>
+              <span class="progress-percentage">{{ getTaskProgress(task) }}%</span>
+            </div>
 
             <!-- Tags da task -->
             <div class="tags-container">
@@ -106,7 +118,14 @@
 
             <!-- Subtasks (sempre expandidas) -->
             <div class="subtasks-container" *ngIf="task.children!.length > 0">
-              <div *ngFor="let sub of task.children" class="task-card subtask-card">
+              <div *ngFor="let sub of task.children" class="task-card subtask-card" [class.completed]="!!sub.completed_at">
+
+                <!-- Checkbox customizada -->
+                <label class="custom-checkbox">
+                  <input type="checkbox" [checked]="!!sub.completed_at" (change)="handleToggleComplete(sub)">
+                  <span class="checkmark"></span>
+                </label>
+
                 <div class="task-content">
                   <h4>{{ sub.title }}</h4>
                   <p *ngIf="sub.description">{{ sub.description }}</p>
@@ -123,7 +142,6 @@
                   <button class="menu-btn" (click)="toggleTaskMenu(sub)">⋮</button>
                   <ul *ngIf="sub.showMenu" class="task-menu">
                     <li (click)="openEditModal(sub)">Editar</li>
-                    <li (click)="handleToggleComplete(sub)">{{ sub.completed_at ? 'Reabrir' : 'Concluir' }}</li>
                     <li (click)="openDeleteConfirm(sub)">Excluir</li>
 
                     <li class="add-tag-container">
@@ -148,7 +166,6 @@
             <ul *ngIf="task.showMenu" class="task-menu">
               <li (click)="openEditModal(task)">Editar</li>
               <li (click)="openCreateTaskModal(task)">Adicionar Subtarefa</li>
-              <li (click)="handleToggleComplete(task)">{{ task.completed_at ? 'Reabrir' : 'Concluir' }}</li>
               <li (click)="openDeleteConfirm(task)">Excluir</li>
 
               <li class="add-tag-container">

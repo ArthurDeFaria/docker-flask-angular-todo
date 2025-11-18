@@ -397,3 +397,103 @@ textarea { min-height:100px; resize:vertical; }
   .task-card { flex-direction: column; align-items: stretch; }
   .task-menu { right: 8px; left: auto; top: 40px; width: 160px; }
 }
+
+/* ---------------------------
+   Barra de Progresso
+   --------------------------- */
+.progress-bar-container {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  background-color: #e9ecef;
+  border-radius: 8px;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: #0d6efd;
+  border-radius: 8px;
+  transition: width 0.3s ease-in-out;
+}
+
+.progress-percentage {
+  position: relative;
+  z-index: 1;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ---------------------------
+   Checkbox customizada para subtasks
+   --------------------------- */
+.subtask-card.completed .task-content h4,
+.subtask-card.completed .task-content p {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.custom-checkbox {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.custom-checkbox input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.custom-checkbox:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.custom-checkbox .checkmark:after {
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
