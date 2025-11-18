@@ -23,6 +23,29 @@
   </div>
 </div>
 
+<!-- Modal Excluir Tarefa -->
+<div class="modal-overlay" *ngIf="taskToDelete" (click)="cancelDeleteTask()">
+  <div class="modal modal-confirm" (click)="$event.stopPropagation()">
+    <h3 class="modal-title">Excluir Tarefa?</h3>
+    <p class="modal-message">
+      Tem certeza que deseja excluir a tarefa:
+      <strong>{{ taskToDelete?.title }}</strong>?
+      <br />
+      Esta ação não pode ser desfeita.
+    </p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancelDeleteTask()">
+        Cancelar
+      </button>
+
+      <button class="btn-delete" (click)="confirmDeleteTask()">
+        Excluir
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Criar Tag -->
 <div *ngIf="isTagModalOpen" class="modal-overlay" (click)="closeCreateTagModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
@@ -93,7 +116,7 @@
             <ul *ngIf="task.showMenu" class="task-menu">
               <li (click)="openEditModal(task)">Editar</li>
               <li (click)="handleToggleComplete(task)">Concluir</li>
-              <li (click)="handleDeleteTask(task.id)">Excluir</li>
+              <li (click)="openDeleteConfirm(task)">Excluir</li>
 
               <li class="add-tag-container">
                 <span>Adicionar Tag</span>
@@ -119,11 +142,11 @@
         <div *ngFor="let task of completedTasks" class="task-card completed">
           <div class="task-content">
             <h3>{{ task.title }}</h3>
+            <p *ngIf="task.description">{{ task.description }}</p>
 
             <div class="tags-container">
               <span *ngFor="let tag of task.tags" class="tag">
                 {{ tag.name }}
-                <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
               </span>
             </div>
           </div>
@@ -136,7 +159,7 @@
             <!-- Menu suspenso -->
             <ul *ngIf="task.showMenu" class="task-menu">
               <li (click)="handleToggleComplete(task)">Reabrir</li>
-              <li (click)="handleDeleteTask(task.id)">Excluir</li>
+              <li (click)="openDeleteConfirm(task)">Excluir</li>
             </ul>
           </div>
         </div>
