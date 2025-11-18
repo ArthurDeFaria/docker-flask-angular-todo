@@ -42,6 +42,10 @@ export class ApiService {
     return this.http.delete<void>(`${this.apiUrl}/tasks/${taskId}`);
   }
 
+  reorderTasks(tasks: {id: number, order: number}[]): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/tasks/reorder`, tasks);
+  }
+
   getTags(): Observable<Tag[]> {
     return this.http.get<Tag[]>(`${this.apiUrl}/tags`);
   }

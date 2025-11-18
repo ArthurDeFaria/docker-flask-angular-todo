@@ -18,6 +18,7 @@ class Task:
     completed_at: Optional[datetime.datetime]
     due_date: Optional[datetime.date] = None
     parent_id: Optional[int] = None
+    order: int = 0
     children: List['Task'] = field(default_factory=list)
     tags: List[Tag] = field(default_factory=list)
 

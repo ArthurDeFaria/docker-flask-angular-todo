@@ -17,6 +17,7 @@ class TaskModel(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
     due_date = db.Column(db.Date, nullable=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('tasks.id'), nullable=True)
+    order = db.Column(db.Integer, nullable=False, default=0, server_default='0')
     children = db.relationship('TaskModel', backref=db.backref('parent', remote_side=[id]))
     
     # Relacionamento muitos-para-muitos com TagModel

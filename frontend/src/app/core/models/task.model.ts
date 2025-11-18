@@ -9,6 +9,7 @@ export interface Task {
   completed_at: string | null; // O Python envia datas como strings
   due_date: string | null;
   parent_id: number | null;
+  order: number;
   children?: Task[]; // Lista opcional de subtarefas
   tags?: Tag[];     // Lista opcional de tags
 }

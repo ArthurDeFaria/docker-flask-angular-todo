@@ -24,6 +24,10 @@ class AbstractTaskRepository(ABC):
     def delete(self, task_id: int) -> None:
         raise NotImplementedError
     
+    @abstractmethod
+    def update_order(self, task_id: int, order: int) -> None:
+        raise NotImplementedError
+    
 class AbstractTagRepository(ABC):
     @abstractmethod
     def add(self, tag: Tag) -> Tag:

@@ -79,6 +79,10 @@ class TaskUseCases:
         
         return False
 
+    def reorder_tasks(self, tasks_data: List[dict]):
+        for task_data in tasks_data:
+            self.task_repository.update_order(task_data['id'], task_data['order'])
+
 class TagUseCases:
     def __init__(self, tag_repository: AbstractTagRepository):
         self.tag_repository = tag_repository

@@ -4,17 +4,20 @@ import { Task } from '../../core/models/task.model';
 import { Tag } from '../../core/models/tag.model';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.html',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, DragDropModule],
   styleUrls: ['./home.css']
 })
 export class Home implements OnInit {
 
   public tasks: Task[] = [];
+  public pendingTasks: Task[] = [];
+  public completedTasks: Task[] = [];
   public tags: Tag[] = [];
 
   public isLoadingTasks = true;
@@ -54,13 +57,19 @@ export class Home implements OnInit {
 
     this.api.getTasks().subscribe({
       next: (data) => {
-        // ensure children array exists for each task
-        this.tasks = (data || []).map((t: any) => ({
+        // Garante que `children` e `tags` existam e ordena as tarefas e subtarefas
+        const processedTasks = (data || []).map((t: any) => ({
           ...t,
-          children: t.children || [],
+          children: (t.children || []).sort((a: Task, b: Task) => a.order - b.order), // Ordena subtarefas
           tags: t.tags || [],
           showMenu: false
         }));
+
+        // Ordena as tarefas principais
+        this.tasks = processedTasks.sort((a: Task, b: Task) => a.order - b.order);
+        this.pendingTasks = this.tasks.filter(t => !t.completed_at && !t.parent_id);
+        this.completedTasks = this.tasks.filter(t => !!t.completed_at && !t.parent_id);
+
         this.isLoadingTasks = false;
       },
       error: () => {
@@ -292,16 +301,41 @@ export class Home implements OnInit {
     });
   }
 
-  /* -------------------- GETTERS -------------------- */
+  /* -------------------- DRAG AND DROP -------------------- */
 
-  get pendingTasks(): Task[] {
-    // apenas tasks raiz que não estão concluídas
-    return this.tasks.filter(t => !t.completed_at && !t.parent_id);
+  dropTask(event: CdkDragDrop<Task[]>) {
+    moveItemInArray(this.pendingTasks, event.previousIndex, event.currentIndex);
+    const tasksToUpdate = this.pendingTasks.map((task, index) => ({
+      id: task.id,
+      order: index
+    }));
+    this.api.reorderTasks(tasksToUpdate).subscribe({
+        next: () => console.log('Ordem das tarefas atualizada com sucesso.'),
+        error: (err) => {
+            console.error('Erro ao reordenar as tarefas', err);
+            this.errorMessage = 'Falha ao reordenar as tarefas.';
+            this.loadTasks();
+        }
+    });
   }
 
-  get completedTasks(): Task[] {
-    // apenas tasks raiz concluídas
-    return this.tasks.filter(t => !!t.completed_at && !t.parent_id);
+  dropSubtask(event: CdkDragDrop<Task[]>, parentTask: Task) {
+    if (!parentTask.children) {
+      return;
+    }
+    moveItemInArray(parentTask.children, event.previousIndex, event.currentIndex);
+    const tasksToUpdate = parentTask.children.map((task, index) => ({
+      id: task.id,
+      order: index
+    }));
+    this.api.reorderTasks(tasksToUpdate).subscribe({
+        next: () => console.log('Ordem das subtarefas atualizada com sucesso.'),
+        error: (err) => {
+            console.error('Erro ao reordenar as subtarefas', err);
+            this.errorMessage = 'Falha ao reordenar as subtarefas.';
+            this.loadTasks();
+        }
+    });
   }
 
   availableTagsForTask(task: Task): Tag[] {

@@ -76,22 +76,13 @@
 
     <div class="tasks-column">
 
-      <!-- Criar Task Principal -->
-      <section class="card">
-        <h2>Nova Tarefa</h2>
-        <p>Clique no botão abaixo para adicionar uma nova tarefa.</p>
-        <button (click)="openCreateTaskModal()" class="btn btn-primary btn-full-width">
-          + Criar Nova Tarefa
-        </button>
-      </section>
-
       <!-- Tarefas Pendentes -->
-      <section class="card">
+      <section class="card" cdkDropList [cdkDropListData]="pendingTasks" (cdkDropListDropped)="dropTask($event)">
         <h2>Tarefas Pendentes</h2>
         <div *ngIf="isLoadingTasks">Carregando tarefas...</div>
         <div *ngIf="!isLoadingTasks && pendingTasks.length === 0">Nenhuma tarefa pendente.</div>
 
-        <div *ngFor="let task of pendingTasks" class="task-card" [class.completed]="!!task.completed_at">
+        <div *ngFor="let task of pendingTasks" class="task-card" [class.completed]="!!task.completed_at" cdkDrag>
           <!-- Checkbox customizada para a task principal -->
           <label class="custom-checkbox">
             <input type="checkbox" [checked]="!!task.completed_at" (change)="handleToggleComplete(task)">
@@ -117,8 +108,8 @@
             </div>
 
             <!-- Subtasks (sempre expandidas) -->
-            <div class="subtasks-container" *ngIf="task.children!.length > 0">
-              <div *ngFor="let sub of task.children" class="task-card subtask-card" [class.completed]="!!sub.completed_at">
+            <div class="subtasks-container" *ngIf="task.children && task.children.length > 0" cdkDropList [cdkDropListData]="task.children" (cdkDropListDropped)="dropSubtask($event, task)">
+              <div *ngFor="let sub of task.children" class="task-card subtask-card" [class.completed]="!!sub.completed_at" cdkDrag>
 
                 <!-- Checkbox customizada -->
                 <label class="custom-checkbox">
@@ -229,7 +220,15 @@
     </div>
 
     <!-- Tags Column -->
-    <div class="tags-column">
+    <div class="right-column">
+      <!-- Criar Task Principal -->
+      <section class="card">
+        <h2>Nova Tarefa</h2>
+        <p>Clique no botão abaixo para adicionar uma nova tarefa.</p>
+        <button (click)="openCreateTaskModal()" class="btn btn-primary btn-full-width">
+          + Criar Nova Tarefa
+        </button>
+      </section>
       <section class="card">
         <h2>Gerenciar Tags</h2>
 

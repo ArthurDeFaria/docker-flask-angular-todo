@@ -117,3 +117,14 @@ def delete_tag(tag_id):
         return jsonify({"error": "Tag não encontrada"}), 404
     except Exception as e:
         return jsonify({"error": "Ocorreu um erro ao deletar a tag", "details": str(e)}), 500
+
+@tasks_bp.route('/api/tasks/reorder', methods=['POST'])
+def reorder_tasks():
+    data = request.get_json()
+    if not data or not isinstance(data, list):
+        return jsonify({"error": "A lista de tarefas é obrigatória"}), 400
+    try:
+        task_use_cases.reorder_tasks(data)
+        return '', 204
+    except Exception as e:
+        return jsonify({"error": "Ocorreu um erro ao reordenar as tarefas", "details": str(e)}), 500

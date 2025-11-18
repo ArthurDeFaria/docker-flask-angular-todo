@@ -384,10 +384,21 @@ textarea { min-height:100px; resize:vertical; }
   .modal.modal-confirm .modal-actions { gap: 8px; flex-direction: row; }
 }
 
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Adjust as needed */
+}
+
+.tasks-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Adjust as needed */
+}
+
 /* ---------------------------
    Tags column specific small tweaks
    --------------------------- */
-.tags-column .card { padding: 1rem; }
 .tags-list-title { margin-top: .75rem; font-weight:700; }
 
 /* ---------------------------

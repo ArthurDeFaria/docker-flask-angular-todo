@@ -13,6 +13,7 @@ class SQLAlchemyTaskRepository(AbstractTaskRepository):
             completed_at=task_model.completed_at,
             due_date=task_model.due_date,
             parent_id=task_model.parent_id,
+            order=task_model.order,
             tags=[SQLAlchemyTagRepository()._to_domain(t) for t in task_model.tags]
         )
 
@@ -22,7 +23,8 @@ class SQLAlchemyTaskRepository(AbstractTaskRepository):
             description=task.description,
             completed_at=task.completed_at,
             due_date=task.due_date,
-            parent_id=task.parent_id
+            parent_id=task.parent_id,
+            order=task.order
         )
         db.session.add(new_task_model)
         db.session.commit()
@@ -35,7 +37,7 @@ class SQLAlchemyTaskRepository(AbstractTaskRepository):
         return None
 
     def get_all(self) -> List[Task]:
-        all_task_models = TaskModel.query.all()
+        all_task_models = TaskModel.query.order_by(TaskModel.order).all()
         return [self._to_domain(tm) for tm in all_task_models]
 
     def update(self, task: Task) -> Task:
@@ -46,6 +48,7 @@ class SQLAlchemyTaskRepository(AbstractTaskRepository):
             task_model.completed_at = task.completed_at
             task_model.due_date = task.due_date
             task_model.parent_id = task.parent_id
+            task_model.order = task.order
 
             if task.tags is not None:
                 tag_ids = [tag.id for tag in task.tags]
@@ -59,6 +62,12 @@ class SQLAlchemyTaskRepository(AbstractTaskRepository):
         task_model = TaskModel.query.get(task_id)
         if task_model:
             db.session.delete(task_model)
+            db.session.commit()
+
+    def update_order(self, task_id: int, order: int) -> None:
+        task_model = TaskModel.query.get(task_id)
+        if task_model:
+            task_model.order = order
             db.session.commit()
 
 class SQLAlchemyTagRepository(AbstractTagRepository):
