@@ -1,8 +1,10 @@
-<!-- Modal Criar Tarefa -->
+<!-- Modal Criar / Editar Tarefa (também usado para Subtarefa) -->
 <div *ngIf="isModalOpen" class="modal-overlay" (click)="closeCreateTaskModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>Criar Nova Tarefa</h2>
+      <h2>
+        {{ isEditing ? (isSubtask ? 'Editar Subtarefa' : 'Editar Tarefa') : (isSubtask ? 'Criar Subtarefa' : 'Criar Nova Tarefa') }}
+      </h2>
       <button (click)="closeCreateTaskModal()" class="modal-close-btn">&times;</button>
     </div>
 
@@ -15,16 +17,17 @@
         <label for="modal-task-desc">Descrição</label>
         <textarea id="modal-task-desc" [(ngModel)]="newTaskDescription" name="newTaskDescription" rows="3"></textarea>
       </div>
+
       <div class="modal-actions">
         <button type="button" (click)="closeCreateTaskModal()" class="btn btn-secondary">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Salvar Tarefa</button>
+        <button type="submit" class="btn btn-primary">{{ isEditing ? 'Salvar' : (isSubtask ? 'Adicionar Subtarefa' : 'Salvar Tarefa') }}</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Modal Excluir Tarefa -->
-<div class="modal-overlay" *ngIf="taskToDelete" (click)="cancelDeleteTask()">
+<!-- Modal Excluir Tarefa (genérico para tasks e subtasks) -->
+<div *ngIf="taskToDelete" class="modal-overlay" (click)="cancelDeleteTask()">
   <div class="modal modal-confirm" (click)="$event.stopPropagation()">
     <h3 class="modal-title">Excluir Tarefa?</h3>
     <p class="modal-message">
@@ -35,13 +38,8 @@
     </p>
 
     <div class="modal-actions">
-      <button class="btn-cancel" (click)="cancelDeleteTask()">
-        Cancelar
-      </button>
-
-      <button class="btn-delete" (click)="confirmDeleteTask()">
-        Excluir
-      </button>
+      <button class="btn-cancel" (click)="cancelDeleteTask()">Cancelar</button>
+      <button class="btn-delete" (click)="confirmDeleteTask()">Excluir</button>
     </div>
   </div>
 </div>
@@ -68,17 +66,17 @@
   </div>
 </div>
 
+<!-- Conteúdo Principal -->
 <div class="container">
   <h1>To Do List</h1>
 
-  <div *ngIf="errorMessage" class="error-box">
-    {{ errorMessage }}
-  </div>
+  <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
 
   <div class="dashboard-grid">
 
     <div class="tasks-column">
 
+      <!-- Criar Task Principal -->
       <section class="card">
         <h2>Nova Tarefa</h2>
         <p>Clique no botão abaixo para adicionar uma nova tarefa.</p>
@@ -87,35 +85,70 @@
         </button>
       </section>
 
+      <!-- Tarefas Pendentes -->
       <section class="card">
         <h2>Tarefas Pendentes</h2>
         <div *ngIf="isLoadingTasks">Carregando tarefas...</div>
-        <div *ngIf="!isLoadingTasks && pendingTasks.length === 0">
-          Nenhuma tarefa pendente.
-        </div>
+        <div *ngIf="!isLoadingTasks && pendingTasks.length === 0">Nenhuma tarefa pendente.</div>
 
         <div *ngFor="let task of pendingTasks" class="task-card">
           <div class="task-content">
             <h3>{{ task.title }}</h3>
             <p *ngIf="task.description">{{ task.description }}</p>
 
+            <!-- Tags da task -->
             <div class="tags-container">
               <span *ngFor="let tag of task.tags" class="tag">
                 {{ tag.name }}
                 <button (click)="handleRemoveTag(task, tag)" class="btn-remove-tag" title="Remover tag">&times;</button>
               </span>
             </div>
+
+            <!-- Subtasks (sempre expandidas) -->
+            <div class="subtasks-container" *ngIf="task.children!.length > 0">
+              <div *ngFor="let sub of task.children" class="task-card subtask-card">
+                <div class="task-content">
+                  <h4>{{ sub.title }}</h4>
+                  <p *ngIf="sub.description">{{ sub.description }}</p>
+
+                  <div class="tags-container">
+                    <span *ngFor="let stag of sub.tags" class="tag">
+                      {{ stag.name }}
+                      <button (click)="handleRemoveTag(sub, stag)" class="btn-remove-tag" title="Remover tag">&times;</button>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="task-menu-wrapper">
+                  <button class="menu-btn" (click)="toggleTaskMenu(sub)">⋮</button>
+                  <ul *ngIf="sub.showMenu" class="task-menu">
+                    <li (click)="openEditModal(sub)">Editar</li>
+                    <li (click)="handleToggleComplete(sub)">{{ sub.completed_at ? 'Reabrir' : 'Concluir' }}</li>
+                    <li (click)="openDeleteConfirm(sub)">Excluir</li>
+
+                    <li class="add-tag-container">
+                      <span>Adicionar Tag</span>
+                      <select (change)="handleAssignTag(sub, $event)" class="add-tag-select">
+                        <option value="">Selecione...</option>
+                        <option *ngFor="let availableTag of availableTagsForTask(sub)" [value]="availableTag.id">
+                          {{ availableTag.name }}
+                        </option>
+                      </select>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
 
+          <!-- Menu da task principal -->
           <div class="task-menu-wrapper">
-            <button class="menu-btn" (click)="toggleTaskMenu(task)">
-              ⋮
-            </button>
+            <button class="menu-btn" (click)="toggleTaskMenu(task)">⋮</button>
 
-            <!-- Menu suspenso -->
             <ul *ngIf="task.showMenu" class="task-menu">
               <li (click)="openEditModal(task)">Editar</li>
-              <li (click)="handleToggleComplete(task)">Concluir</li>
+              <li (click)="openCreateTaskModal(task)">Adicionar Subtarefa</li>
+              <li (click)="handleToggleComplete(task)">{{ task.completed_at ? 'Reabrir' : 'Concluir' }}</li>
               <li (click)="openDeleteConfirm(task)">Excluir</li>
 
               <li class="add-tag-container">
@@ -132,12 +165,11 @@
         </div>
       </section>
 
+      <!-- Tarefas Concluídas -->
       <section class="card">
         <h2>Tarefas Concluídas</h2>
         <div *ngIf="isLoadingTasks">Carregando...</div>
-        <div *ngIf="!isLoadingTasks && completedTasks.length === 0">
-          Nenhuma tarefa concluída.
-        </div>
+        <div *ngIf="!isLoadingTasks && completedTasks.length === 0">Nenhuma tarefa concluída.</div>
 
         <div *ngFor="let task of completedTasks" class="task-card completed">
           <div class="task-content">
@@ -145,18 +177,31 @@
             <p *ngIf="task.description">{{ task.description }}</p>
 
             <div class="tags-container">
-              <span *ngFor="let tag of task.tags" class="tag">
-                {{ tag.name }}
-              </span>
+              <span *ngFor="let tag of task.tags" class="tag">{{ tag.name }}</span>
+            </div>
+
+            <!-- Subtasks (concluídas) -->
+            <div class="subtasks-container" *ngIf="task.children!.length > 0">
+              <div *ngFor="let sub of task.children" class="task-card subtask-card" [class.completed]="sub.completed_at">
+                <div class="task-content">
+                  <h4>{{ sub.title }}</h4>
+                </div>
+
+                <div class="task-menu-wrapper">
+                  <button class="menu-btn" (click)="toggleTaskMenu(sub)">⋮</button>
+                  <ul *ngIf="sub.showMenu" class="task-menu">
+                    <li (click)="openEditModal(sub)">Editar</li>
+                    <li (click)="handleToggleComplete(sub)">{{ sub.completed_at ? 'Reabrir' : 'Concluir' }}</li>
+                    <li (click)="openDeleteConfirm(sub)">Excluir</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="task-menu-wrapper">
-            <button class="menu-btn" (click)="toggleCompletedMenu(task)">
-              ⋮
-            </button>
+            <button class="menu-btn" (click)="toggleCompletedMenu(task)">⋮</button>
 
-            <!-- Menu suspenso -->
             <ul *ngIf="task.showMenu" class="task-menu">
               <li (click)="handleToggleComplete(task)">Reabrir</li>
               <li (click)="openDeleteConfirm(task)">Excluir</li>
@@ -164,25 +209,23 @@
           </div>
         </div>
       </section>
-
     </div>
 
+    <!-- Tags Column -->
     <div class="tags-column">
       <section class="card">
         <h2>Gerenciar Tags</h2>
 
-        <button (click)="openCreateTagModal()" class="btn btn-primary btn-full-width">
-          + Criar Nova Tag
-        </button>
+        <button (click)="openCreateTagModal()" class="btn btn-primary btn-full-width">+ Criar Nova Tag</button>
 
         <h3 class="tags-list-title">Tags Existentes</h3>
         <div *ngIf="isLoadingTags">Carregando tags...</div>
+
         <div class="tags-container">
           <span *ngIf="!isLoadingTags && tags.length === 0">Nenhuma tag criada.</span>
           <span *ngFor="let tag of tags" class="tag">{{ tag.name }}</span>
         </div>
       </section>
     </div>
-
   </div>
 </div>

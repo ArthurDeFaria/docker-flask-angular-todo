@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ApiService, CreateTaskPayload, UpdateTaskPayload } from '../../core/services/api.service';
 import { Task } from '../../core/models/task.model';
 import { Tag } from '../../core/models/tag.model';
@@ -9,10 +9,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.html',
-  imports: [
-    FormsModule,
-    CommonModule,
-  ],
+  imports: [FormsModule, CommonModule],
   styleUrls: ['./home.css']
 })
 export class Home implements OnInit {
@@ -27,53 +24,24 @@ export class Home implements OnInit {
   public isModalOpen = false;
   public isTagModalOpen = false;
 
+  // Modal control
+  public isEditing = false; // true = editing task / false = creating task
+  public isSubtask = false; // true = creating subtask
+  public parentTask: Task | null = null;
+
   // Form fields
   public newTaskTitle = '';
   public newTaskDescription = '';
 
   public newTagName = '';
-
-  // Control editing mode
-  public editingTask: Task | null = null;
-
   public taskToDelete: Task | null = null;
+
+  public editingTask: Task | null = null;
 
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
     this.loadAllData();
-  }
-
-  openCreateTaskModal(): void {
-    this.isModalOpen = true;
-    this.editingTask = null;
-    this.newTaskTitle = '';
-    this.newTaskDescription = '';
-  }
-
-  openEditModal(task: Task): void {
-    this.isModalOpen = true;
-    this.editingTask = task;
-    this.newTaskTitle = task.title;
-    this.newTaskDescription = task.description || '';
-
-    task.showMenu = false; // Fecha menu após clicar
-  }
-
-  closeCreateTaskModal(): void {
-    this.isModalOpen = false;
-    this.newTaskTitle = '';
-    this.newTaskDescription = '';
-    this.editingTask = null;
-  }
-
-  openCreateTagModal(): void {
-    this.isTagModalOpen = true;
-  }
-
-  closeCreateTagModal(): void {
-    this.isTagModalOpen = false;
-    this.newTagName = '';
   }
 
   loadAllData(): void {
@@ -83,9 +51,16 @@ export class Home implements OnInit {
 
   loadTasks(): void {
     this.isLoadingTasks = true;
+
     this.api.getTasks().subscribe({
       next: (data) => {
-        this.tasks = data;
+        // ensure children array exists for each task
+        this.tasks = (data || []).map((t: any) => ({
+          ...t,
+          children: t.children || [],
+          tags: t.tags || [],
+          showMenu: false
+        }));
         this.isLoadingTasks = false;
       },
       error: () => {
@@ -99,7 +74,7 @@ export class Home implements OnInit {
     this.isLoadingTags = true;
     this.api.getTags().subscribe({
       next: (data) => {
-        this.tags = data;
+        this.tags = data || [];
         this.isLoadingTags = false;
       },
       error: () => {
@@ -109,29 +84,79 @@ export class Home implements OnInit {
     });
   }
 
+  /* -------------------- MODAL DE TASK -------------------- */
+
+  // chamado pelo botão "+ Criar Nova Tarefa" (p/ task raiz) ou pelo menu de task (p/ subtask)
+  openCreateTaskModal(parentTask?: Task): void {
+    this.isModalOpen = true;
+    this.isEditing = false;
+
+    this.isSubtask = !!parentTask;
+    this.parentTask = parentTask || null;
+
+    this.newTaskTitle = '';
+    this.newTaskDescription = '';
+  }
+
+  openEditModal(task: Task): void {
+    this.isModalOpen = true;
+    this.isEditing = true;
+    this.editingTask = task;
+    this.isSubtask = !!task.parent_id;
+
+    this.newTaskTitle = task.title;
+    this.newTaskDescription = task.description || '';
+
+    task.showMenu = false;
+  }
+
+  closeCreateTaskModal(): void {
+    this.isModalOpen = false;
+    this.isEditing = false;
+    this.isSubtask = false;
+    this.parentTask = null;
+    this.editingTask = null;
+    this.newTaskTitle = '';
+    this.newTaskDescription = '';
+  }
+
+  // HTML's form uses (ngSubmit)="handleCreateTask()" — expõe método público
+  public handleCreateTask(): void {
+    this.saveTask();
+  }
+
+  /* -------------------- SALVAR TASK / SUBTASK -------------------- */
+
   saveTask(): void {
     if (!this.newTaskTitle.trim()) return;
 
-    if (this.editingTask) {
+    if (this.isEditing && this.editingTask) {
       this.updateTask();
     } else {
-      this.handleCreateTask();
+      this.createTaskOrSubtask();
     }
   }
 
-  public handleCreateTask(): void {
+  createTaskOrSubtask(): void {
     const payload: CreateTaskPayload = {
       title: this.newTaskTitle,
-      description: this.newTaskDescription || undefined
+      description: this.newTaskDescription || undefined,
+      parent_id: this.parentTask ? this.parentTask.id : undefined
     };
 
-    this.api.createTask(payload).subscribe(() => {
-      this.loadTasks();
-      this.closeCreateTaskModal();
+    this.api.createTask(payload).subscribe({
+      next: () => {
+        this.loadTasks();
+        this.closeCreateTaskModal();
+      },
+      error: (err) => {
+        console.error('Erro ao criar tarefa/subtarefa', err);
+        this.errorMessage = 'Falha ao criar tarefa.';
+      }
     });
   }
 
-  private updateTask(): void {
+  updateTask(): void {
     if (!this.editingTask) return;
 
     const payload: UpdateTaskPayload = {
@@ -139,39 +164,65 @@ export class Home implements OnInit {
       description: this.newTaskDescription || undefined
     };
 
-    this.api.updateTask(this.editingTask.id, payload).subscribe(() => {
-      this.loadTasks();
-      this.closeCreateTaskModal();
+    this.api.updateTask(this.editingTask.id, payload).subscribe({
+      next: () => {
+        this.loadTasks();
+        this.closeCreateTaskModal();
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar tarefa', err);
+        this.errorMessage = 'Falha ao atualizar tarefa.';
+      }
     });
+  }
+
+  /* ---------------- SUBTASK PROGRESSION ---------------- */
+
+  areAllSubtasksCompleted(task: Task): boolean {
+    return !task.children || task.children.length === 0 || task.children.every(st => !!st.completed_at);
   }
 
   handleToggleComplete(task: Task): void {
+    const isCompleting = !task.completed_at;
+
+    // Se for concluir uma Task → só pode se todas subtasks concluídas
+    if (isCompleting && !this.areAllSubtasksCompleted(task)) {
+      alert('Você só pode concluir essa tarefa quando TODAS as subtarefas forem concluídas.');
+      return;
+    }
+
     const payload: UpdateTaskPayload = {
-      done: !task.completed_at
+      done: isCompleting
     };
 
-    this.api.updateTask(task.id, payload).subscribe(() => {
-      this.loadTasks();
+    this.api.updateTask(task.id, payload).subscribe({
+      next: () => this.loadTasks(),
+      error: (err) => {
+        console.error('Erro ao alternar conclusão', err);
+        this.errorMessage = 'Falha ao atualizar tarefa.';
+      }
     });
   }
 
-  handleDeleteTask(taskId: number): void {
-    this.api.deleteTask(taskId).subscribe(() => {
-      this.loadTasks();
-    });
-  }
+  /* -------------------- DELETE -------------------- */
 
   openDeleteConfirm(task: Task) {
     this.taskToDelete = task;
-    task.showMenu = false; // fecha dropdown ao clicar em excluir
+    task.showMenu = false;
   }
 
   confirmDeleteTask() {
     if (!this.taskToDelete) return;
 
-    this.api.deleteTask(this.taskToDelete.id).subscribe(() => {
-      this.loadTasks();
-      this.taskToDelete = null;
+    this.api.deleteTask(this.taskToDelete.id).subscribe({
+      next: () => {
+        this.loadTasks();
+        this.taskToDelete = null;
+      },
+      error: (err) => {
+        console.error('Erro ao excluir', err);
+        this.errorMessage = 'Falha ao excluir tarefa.';
+      }
     });
   }
 
@@ -179,11 +230,28 @@ export class Home implements OnInit {
     this.taskToDelete = null;
   }
 
+  /* -------------------- TAGS -------------------- */
+
+  openCreateTagModal(): void {
+    this.isTagModalOpen = true;
+  }
+
+  closeCreateTagModal(): void {
+    this.isTagModalOpen = false;
+    this.newTagName = '';
+  }
+
   handleCreateTag(): void {
     if (!this.newTagName.trim()) return;
-    this.api.createTag(this.newTagName).subscribe(() => {
-      this.loadTags();
-      this.closeCreateTagModal();
+    this.api.createTag(this.newTagName).subscribe({
+      next: () => {
+        this.loadTags();
+        this.closeCreateTagModal();
+      },
+      error: (err) => {
+        console.error('Erro ao criar tag', err);
+        this.errorMessage = 'Falha ao criar tag.';
+      }
     });
   }
 
@@ -192,24 +260,39 @@ export class Home implements OnInit {
     const tagId = selectElement.value;
     if (!tagId) return;
 
-    this.api.addTagToTask(task.id, +tagId).subscribe(() => {
-      this.loadTasks();
-      selectElement.value = '';
+    this.api.addTagToTask(task.id, +tagId).subscribe({
+      next: () => {
+        this.loadTasks();
+        selectElement.value = '';
+      },
+      error: (err) => {
+        console.error('Erro ao adicionar tag', err);
+        this.errorMessage = 'Falha ao adicionar tag à tarefa.';
+        selectElement.value = '';
+      }
     });
   }
 
   handleRemoveTag(task: Task, tag: Tag): void {
-    this.api.removeTagFromTask(task.id, tag.id).subscribe(() => {
-      this.loadTasks();
+    this.api.removeTagFromTask(task.id, tag.id).subscribe({
+      next: () => this.loadTasks(),
+      error: (err) => {
+        console.error('Erro ao remover tag', err);
+        this.errorMessage = 'Falha ao remover tag.';
+      }
     });
   }
 
+  /* -------------------- GETTERS -------------------- */
+
   get pendingTasks(): Task[] {
-    return this.tasks.filter(t => !t.completed_at);
+    // apenas tasks raiz que não estão concluídas
+    return this.tasks.filter(t => !t.completed_at && !t.parent_id);
   }
 
   get completedTasks(): Task[] {
-    return this.tasks.filter(t => !!t.completed_at);
+    // apenas tasks raiz concluídas
+    return this.tasks.filter(t => !!t.completed_at && !t.parent_id);
   }
 
   availableTagsForTask(task: Task): Tag[] {
@@ -217,17 +300,28 @@ export class Home implements OnInit {
     return this.tags.filter(t => !taskTagIds.has(t.id));
   }
 
+  /* -------------------- MENUS -------------------- */
+
   toggleTaskMenu(task: Task) {
+    this.closeAllTaskMenus();
     task.showMenu = !task.showMenu;
-    this.pendingTasks.forEach(t => {
-      if (t !== task) t.showMenu = false;
-    });
   }
 
   toggleCompletedMenu(task: Task) {
+    this.closeAllTaskMenus();
     task.showMenu = !task.showMenu;
-    this.completedTasks.forEach(t => {
-      if (t !== task) t.showMenu = false;
-    });
   }
+
+  closeAllTaskMenus() {
+    this.tasks.forEach(t => (t as any).showMenu = false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeMenuOnOutsideClick(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.task-menu-wrapper')) {
+      this.closeAllTaskMenus();
+    }
+  }
+
 }
