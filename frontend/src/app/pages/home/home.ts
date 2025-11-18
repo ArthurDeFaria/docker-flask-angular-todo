@@ -36,6 +36,8 @@ export class Home implements OnInit {
   // Control editing mode
   public editingTask: Task | null = null;
 
+  public taskToDelete: Task | null = null;
+
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
@@ -157,6 +159,24 @@ export class Home implements OnInit {
     this.api.deleteTask(taskId).subscribe(() => {
       this.loadTasks();
     });
+  }
+
+  openDeleteConfirm(task: Task) {
+    this.taskToDelete = task;
+    task.showMenu = false; // fecha dropdown ao clicar em excluir
+  }
+
+  confirmDeleteTask() {
+    if (!this.taskToDelete) return;
+
+    this.api.deleteTask(this.taskToDelete.id).subscribe(() => {
+      this.loadTasks();
+      this.taskToDelete = null;
+    });
+  }
+
+  cancelDeleteTask() {
+    this.taskToDelete = null;
   }
 
   handleCreateTag(): void {
