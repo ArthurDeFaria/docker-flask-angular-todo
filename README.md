@@ -68,7 +68,7 @@ Antes de começar, você vai precisar ter as seguintes ferramentas instaladas:
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/ArthurDeFaria/docker-flask-angular-todo.git](https://github.com/ArthurDeFaria/docker-flask-angular-todo.git)
+    git clone https://github.com/ArthurDeFaria/docker-flask-angular-todo.git
     ```
 
 2.  **Navegue até a pasta raiz do projeto:**
