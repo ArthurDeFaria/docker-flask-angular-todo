@@ -141,17 +141,6 @@ O projeto está organizado em um monorepo, com o backend seguindo os princípios
 │   └── nginx.conf
 └── docker-compose.yml        # Orquestra os containers
 ```
-
----
-## Autores
-
-Este projeto foi desenvolvido por:
-
-* **[Nome do Aluno 1]** - `[Link para o GitHub]`
-* **[Nome do Aluno 2]** - `[Link para o GitHub]`
-* **[Nome do Aluno 3]** - `[Link para o GitHub]`
-* **[Nome do Aluno 4]** - `[Link para o GitHub]`
-
 ---
 ## Licença
 
