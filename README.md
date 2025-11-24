@@ -35,16 +35,16 @@ A aplicação agora conta com uma tela de login moderna e minimalista, protegend
 Aqui estão algumas capturas de tela da aplicação:
 
 ### Tela de Login (Tema Escuro)
-![Tela de Login no tema escuro](https://imgur.com/3c4b3LY)
+![Tela de Login no tema escuro](https://imgur.com/a/couzPG1#3c4b3LY)
 
 ### Tela de Login (Tema Claro)
-![Tela de Login no tema claro](https://imgur.com/rFFcYHJ)
+![Tela de Login no tema claro](https://imgur.com/a/couzPG1#rFFcYHJ)
 
 ### Tela Principal - Lista de Tarefas (Tema Escuro)
-![Tela principal da lista de tarefas no tema escuro](https://imgur.com/SZRA02g)
+![Tela principal da lista de tarefas no tema escuro](https://imgur.com/a/couzPG1#SZRA02g)
 
 ### Tela Principal - Lista de Tarefas (Tema Claro)
-![Tela principal da lista de tarefas no tema claro](https://imgur.com/1Udqi0Z)
+![Tela principal da lista de tarefas no tema claro](https://imgur.com/a/couzPG1#1Udqi0Z)
 
 ## Tecnologias Utilizadas
 
