@@ -18,6 +18,7 @@ A aplicação permite o gerenciamento de tarefas com as seguintes funcionalidade
 * **Progresso:** Cálculo de porcentagem de conclusão para tarefas "pai".
 * **Tags:** Sistema de tags (etiquetas) para categorizar tarefas.
 * **Calendário:** Visualização das tarefas com prazo em um calendário.
+* **Suporte a Temas:** Alternância entre temas claro e escuro.
 
 ## Autenticação
 
@@ -28,6 +29,22 @@ A aplicação agora conta com uma tela de login moderna e minimalista, protegend
     *   **Senha:** `password`
 *   **Persistência de Sessão:** A sessão do usuário é persistida no `localStorage` do navegador, mantendo o usuário logado mesmo após recarregar a página.
 *   **Visualização de Senha:** O campo de senha possui um ícone de olho para permitir visualizar ou ocultar a senha digitada.
+
+## Screenshots
+
+Aqui estão algumas capturas de tela da aplicação:
+
+### Tela de Login (Tema Escuro)
+![Tela de Login no tema escuro](https://imgur.com/3c4b3LY)
+
+### Tela de Login (Tema Claro)
+![Tela de Login no tema claro](https://imgur.com/rFFcYHJ)
+
+### Tela Principal - Lista de Tarefas (Tema Escuro)
+![Tela principal da lista de tarefas no tema escuro](https://imgur.com/SZRA02g)
+
+### Tela Principal - Lista de Tarefas (Tema Claro)
+![Tela principal da lista de tarefas no tema claro](https://imgur.com/1Udqi0Z)
 
 ## Tecnologias Utilizadas
 
