@@ -68,7 +68,10 @@
 
 <!-- Conteúdo Principal -->
 <div class="container">
-  <h1>To Do List</h1>
+  <div class="main-header">
+    <h1>To Do List</h1>
+    <app-theme-toggle></app-theme-toggle>
+  </div>
 
   <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
 

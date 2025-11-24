@@ -3,13 +3,14 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ThemeToggleComponent } from '../../components/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
   standalone: true,
-  imports: [FormsModule, CommonModule]
+  imports: [FormsModule, CommonModule, ThemeToggleComponent]
 })
 export class LoginComponent {
   email = '';

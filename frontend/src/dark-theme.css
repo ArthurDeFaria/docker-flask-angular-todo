@@ -1,0 +1,14 @@
+body.dark-theme {
+  --background-color: #121212;
+  --text-color: #e0e0e0;
+  --card-background: #1e1e1e;
+  --card-border-color: #2c2c2c;
+  --input-background: #2c2c2c;
+  --input-border-color: #3c3c3c;
+  --primary-color: #0d6efd;
+  --primary-hover-color: #0b5ed7;
+  --secondary-color: #03dac6;
+  --tag-background: #3730a3;
+  --tag-text-color: #eef2ff;
+  --tag-remove-color: #eef2ff;
+}

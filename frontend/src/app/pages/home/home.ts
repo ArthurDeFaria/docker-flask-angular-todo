@@ -5,12 +5,13 @@ import { Tag } from '../../core/models/tag.model';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
+import { ThemeToggleComponent } from '../../components/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   templateUrl: './home.html',
-  imports: [FormsModule, CommonModule, DragDropModule],
+  imports: [FormsModule, CommonModule, DragDropModule, ThemeToggleComponent],
   styleUrls: ['./home.css']
 })
 export class HomeComponent implements OnInit {
