@@ -12,11 +12,22 @@ O principal objetivo do projeto é demonstrar a aplicação de conceitos de DevO
 
 A aplicação permite o gerenciamento de tarefas com as seguintes funcionalidades planejadas:
 
+* **Autenticação de Usuário:** Tela de login com mock de usuário e persistência de sessão.
 * **CRUD Básico:** Criar, listar, atualizar e deletar tarefas.
 * **Hierarquia:** Suporte para tarefas e sub-tarefas aninhadas.
 * **Progresso:** Cálculo de porcentagem de conclusão para tarefas "pai".
 * **Tags:** Sistema de tags (etiquetas) para categorizar tarefas.
 * **Calendário:** Visualização das tarefas com prazo em um calendário.
+
+## Autenticação
+
+A aplicação agora conta com uma tela de login moderna e minimalista, protegendo o acesso às funcionalidades principais.
+
+*   **Mock de Usuário:** Para fins de desenvolvimento, um usuário mockado é utilizado para o login.
+    *   **Email:** `test@example.com`
+    *   **Senha:** `password`
+*   **Persistência de Sessão:** A sessão do usuário é persistida no `localStorage` do navegador, mantendo o usuário logado mesmo após recarregar a página.
+*   **Visualização de Senha:** O campo de senha possui um ícone de olho para permitir visualizar ou ocultar a senha digitada.
 
 ## Tecnologias Utilizadas
 
@@ -82,7 +93,9 @@ Este é o método mais simples para subir a aplicação completa.
     ```
 
 2.  **Acesse a aplicação:**
-    Abra seu navegador e acesse `http://localhost:4200`.
+    Abra seu navegador e acesse `http://localhost:4200`. Você será redirecionado para a tela de login. Utilize as credenciais mockadas para acessar:
+    *   **Email:** `test@example.com`
+    *   **Senha:** `password`
 
 ### 3. Usando Docker Swarm (Modo de Cluster)
 

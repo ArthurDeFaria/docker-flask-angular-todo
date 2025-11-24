@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Home } from './pages/home/home';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -10,21 +9,11 @@ import { FormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     FormsModule,
-    Home,
-    Home
+    RouterModule
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'frontend';
-  messageFromApi = 'Carregando...';
-
-  constructor(private http: HttpClient) {}
-
-  ngOnInit(): void {
-    this.http.get<{ message: string }>('http://localhost:5000/api/message').subscribe(data => {
-      this.messageFromApi = data.message;
-    });
-  }
 }

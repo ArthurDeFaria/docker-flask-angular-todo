@@ -13,7 +13,7 @@ import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-
   imports: [FormsModule, CommonModule, DragDropModule],
   styleUrls: ['./home.css']
 })
-export class Home implements OnInit {
+export class HomeComponent implements OnInit {
 
   public tasks: Task[] = [];
   public pendingTasks: Task[] = [];

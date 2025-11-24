@@ -1,0 +1,108 @@
+:host {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  height: 100%;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f7f6;
+}
+
+.login-form {
+  width: 380px;
+  padding: 40px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(12, 20, 30, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.03);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper input {
+  padding-right: 45px; /* Make space for the icon */
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: .9rem;
+  color: #334155;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  font-size: .95rem;
+  border-radius: 8px;
+  border: 1px solid #e6eef8;
+  box-sizing: border-box;
+  background-color: #f8f9fa;
+  color: #333;
+  transition: border-color 0.2s;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: #0d6efd;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .95rem;
+  background: #0d6efd;
+  color: #fff;
+  transition: filter 0.2s;
+}
+
+button:hover {
+  filter: brightness(.95);
+}
+
+.error-message {
+  color: #7b1919;
+  background: #fff3f2;
+  border: 1px solid #ffd2d2;
+  padding: .9rem;
+  border-radius: 6px;
+  margin-top: 20px;
+  text-align: center;
+}
