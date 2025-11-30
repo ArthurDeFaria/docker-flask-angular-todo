@@ -1,6 +1,7 @@
 services:
   # Serviço do Backend (Flask API)
   backend:
+    image: todoapp-backend:latest
     build: ./backend
     ports:
       - "5000:5000"
@@ -11,8 +12,20 @@ services:
 
   # Serviço do Frontend (Angular UI)
   frontend:
+    image: todoapp-frontend:latest
     build: ./frontend
     ports:
       - "4200:80"
     depends_on:
       - backend
+
+  visualizer:
+      image: dockersamples/visualizer:stable
+      ports:
+        - "8080:8080"
+      stop_grace_period: 1m30s
+      volumes:
+        - "/var/run/docker.sock:/var/run/docker.sock"
+      deploy:
+        placement:
+          constraints: [node.role == manager]
